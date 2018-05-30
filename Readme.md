@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Никита Штрейс](https://up.htmlacademy.ru/javascript/14/user/133933).
-* Наставник: `Неизвестно`.
+* Наставник: [Олег Петров](https://up.htmlacademy.ru/javascript/14/user/42390).
 
 ---
 
