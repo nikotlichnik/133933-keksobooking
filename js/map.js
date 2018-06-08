@@ -162,29 +162,6 @@ var createPinsFragment = function () {
   return fragment;
 };
 
-// Функция получения описания цены в объявлении
-var getHousePrice = function (adNumber) {
-  var price = ads[adNumber].offer.price;
-
-  return price + '₽/ночь';
-};
-
-// Функция получения описания вместимости жилья
-var getCapacityOfHouse = function (adNumber) {
-  var rooms = ads[adNumber].offer.rooms;
-  var guests = ads[adNumber].offer.guests;
-
-  return rooms + ' комнаты для ' + guests + ' гостей';
-};
-
-// Функция получения описания часов заезда/выезда
-var getCheckinCheckoutHours = function (adNumber) {
-  var checkin = ads[adNumber].offer.checkin;
-  var checkout = ads[adNumber].offer.checkout;
-
-  return 'Заезд после ' + checkin + ', выезд до ' + checkout;
-};
-
 // Функция удаления неуказанных в конкретном объявлении удобств из полного списка
 var changeFeaturesList = function (list, adNumber) {
   var currentAdFeatures = ads[adNumber].offer.features;
@@ -217,15 +194,20 @@ var generateInfoCard = function (adNumber) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
+
   var houseType = ads[adNumber].offer.type;
+  var rooms = ads[adNumber].offer.rooms;
+  var guests = ads[adNumber].offer.guests;
+  var checkin = ads[adNumber].offer.checkin;
+  var checkout = ads[adNumber].offer.checkout;
 
   card.querySelector('.popup__avatar').src = ads[adNumber].author.avatar;
   card.querySelector('.popup__title').textContent = ads[adNumber].offer.title;
   card.querySelector('.popup__text--address').textContent = ads[adNumber].offer.address;
-  card.querySelector('.popup__text--price').textContent = getHousePrice(adNumber);
+  card.querySelector('.popup__text--price').textContent = ads[adNumber].offer.price + '₽/ночь';
   card.querySelector('.popup__type').textContent = offerTypesTranslation[houseType];
-  card.querySelector('.popup__text--capacity').textContent = getCapacityOfHouse(adNumber);
-  card.querySelector('.popup__text--time').textContent = getCheckinCheckoutHours(adNumber);
+  card.querySelector('.popup__text--capacity').textContent = rooms + ' комнаты для ' + guests + ' гостей';
+  card.querySelector('.popup__text--time').textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
   card.querySelector('.popup__description').textContent = ads[adNumber].offer.description;
   changeFeaturesList(featuresList, adNumber);
   fillPhotoList(photosList, adNumber);
