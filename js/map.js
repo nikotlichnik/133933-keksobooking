@@ -62,13 +62,19 @@ var getRandomNumberInRange = function (startNumber, finishNumber) {
   return startNumber + Math.round(Math.random() * (finishNumber - startNumber));
 };
 
-// Функция генерации путей доступных изображений
+// Функция получения пути к изображению
+var getPicturePath = function (number) {
+  var n = number < 10 ? '0' + number : number;
+
+  return 'img/avatars/user' + n + '.png';
+};
+
+// Функция создания массива с путями к доступным изображениям
 var generateAvailablePictures = function () {
   var paths = [];
 
   for (var i = 1; i <= NUM_OF_ADS; i++) {
-    var picturePath = 'img/avatars/user0' + i + '.png';
-    paths.push(picturePath);
+    paths.push(getPicturePath(i));
   }
 
   return paths;
