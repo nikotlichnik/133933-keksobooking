@@ -44,6 +44,13 @@ var pinParams = {
   HEIGHT: 70
 };
 
+var offerTypesTranslation = {
+  flat: 'Квартира',
+  palace: 'Дворец',
+  house: 'Дом',
+  bungalo: 'Бунгало'
+};
+
 var map = document.querySelector('.map');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
@@ -155,26 +162,6 @@ var createPinsFragment = function () {
   return fragment;
 };
 
-// Функция перевода типа жилья на русский язык
-var getRussianHouseType = function (adNumber) {
-  var type = ads[adNumber].offer.type;
-  var russianType = 'Квартира';
-
-  switch (type) {
-    case 'bungalo':
-      russianType = 'Бунгало';
-      break;
-    case 'house':
-      russianType = 'Дом';
-      break;
-    case 'palace':
-      russianType = 'Дворец';
-      break;
-  }
-
-  return russianType;
-};
-
 // Функция получения описания цены в объявлении
 var getHousePrice = function (adNumber) {
   var price = ads[adNumber].offer.price;
@@ -230,12 +217,13 @@ var generateInfoCard = function (adNumber) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
+  var houseType = ads[adNumber].offer.type;
 
   card.querySelector('.popup__avatar').src = ads[adNumber].author.avatar;
   card.querySelector('.popup__title').textContent = ads[adNumber].offer.title;
   card.querySelector('.popup__text--address').textContent = ads[adNumber].offer.address;
   card.querySelector('.popup__text--price').textContent = getHousePrice(adNumber);
-  card.querySelector('.popup__type').textContent = getRussianHouseType(adNumber);
+  card.querySelector('.popup__type').textContent = offerTypesTranslation[houseType];
   card.querySelector('.popup__text--capacity').textContent = getCapacityOfHouse(adNumber);
   card.querySelector('.popup__text--time').textContent = getCheckinCheckoutHours(adNumber);
   card.querySelector('.popup__description').textContent = ads[adNumber].offer.description;
