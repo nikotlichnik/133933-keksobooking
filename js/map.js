@@ -182,13 +182,14 @@ var fillPhotoList = function (photosList, adNumber) {
   var photoTemplate = photosList.querySelector('.popup__photo');
   var photos = ads[adNumber].offer.photos;
 
+  // Удаление пустого шаблона из разметки
+  photosList.removeChild(photoTemplate);
+
   for (var i = 0; i < photos.length; i++) {
     var photo = photoTemplate.cloneNode(true);
     photo.src = photos[i];
     photosList.appendChild(photo);
   }
-
-  photoTemplate.parentNode.removeChild(photoTemplate);
 };
 
 // Функция создания фрагмента карточки с объявлением
