@@ -87,15 +87,10 @@ var getShuffledArray = function (array) {
 
 // Функция генерации случайного набора удобств для каждого объявления
 var getAdFeatures = function () {
-  var features = [];
   var shuffledFeatures = getShuffledArray(adParams.offer.FEATURES);
-  var numberOfFeatures = getRandomIndexOfArray(shuffledFeatures) + 1;
+  var randomIndex = getRandomIndexOfArray(shuffledFeatures);
 
-  for (var i = 0; i < numberOfFeatures; i++) {
-    features.push(shuffledFeatures[i]);
-  }
-
-  return features;
+  return shuffledFeatures.slice(0, randomIndex);
 };
 
 // Функция создания объявления
