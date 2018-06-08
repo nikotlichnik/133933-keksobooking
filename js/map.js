@@ -139,6 +139,11 @@ var generateSimilarAds = function () {
   return randomAds;
 };
 
+// Функция инициализации страницы
+var initPage = function () {
+  var map = document.querySelector('.map');
+  map.classList.remove('map--faded');
+};
 
 var availablePictures = generateAvailablePictures();
 
@@ -146,3 +151,4 @@ var shuffledPictures = getShuffledArray(availablePictures);
 var shuffledTitles = getShuffledArray(adParams.offer.TITLES);
 
 var ads = generateSimilarAds();
+initPage();
