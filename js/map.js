@@ -5,7 +5,9 @@ var INDEX_OF_FULL_DESCRIBED_AD = 0;
 
 var adParams = {
   offer: {
-    TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
+    TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
+      'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик',
+      'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
     PRICE: {
       MIN: 1000,
       MAX: 1000000
@@ -22,7 +24,9 @@ var adParams = {
     CHECKINS: ['12:00', '13:00', '14:00'],
     CHECKOUTS: ['12:00', '13:00', '14:00'],
     FEATURES: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-    PHOTOS: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
+    PHOTOS: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+      'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+      'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
   },
   LOCATION: {
     X: {
