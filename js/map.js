@@ -162,16 +162,18 @@ var createPinsFragment = function () {
   return fragment;
 };
 
-// Функция удаления неуказанных в конкретном объявлении удобств из полного списка
-var changeFeaturesList = function (list, adNumber) {
-  var currentAdFeatures = ads[adNumber].offer.features;
-  var allFeatures = offerParams.FEATURES;
+// Функция очистки и заполнения списка удобств
+var changeFeaturesList = function (list, features) {
+  // Очистка списка
+  for (var i = list.children.length - 1; i >= 0; i--) {
+    list.removeChild(list.children[i]);
+  }
 
-  for (var i = 0; i < allFeatures.length; i++) {
-    if (!currentAdFeatures.includes(allFeatures[i])) {
-      var featureItem = list.querySelector('.popup__feature--' + allFeatures[i]);
-      list.removeChild(featureItem);
-    }
+  // Добавление существующих удобств
+  for (var j = 0; j < features.length; j++) {
+    var featureItem = document.createElement('li');
+    featureItem.classList.add('popup__feature', 'popup__feature--' + features[j]);
+    list.appendChild(featureItem);
   }
 };
 
@@ -209,7 +211,7 @@ var generateInfoCard = function (adNumber) {
   card.querySelector('.popup__text--capacity').textContent = rooms + ' комнаты для ' + guests + ' гостей';
   card.querySelector('.popup__text--time').textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
   card.querySelector('.popup__description').textContent = ads[adNumber].offer.description;
-  changeFeaturesList(featuresList, adNumber);
+  changeFeaturesList(featuresList, ads[adNumber].offer.features);
   fillPhotoList(photosList, adNumber);
 
   return card;
