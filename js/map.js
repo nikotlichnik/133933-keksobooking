@@ -3,40 +3,39 @@
 var NUM_OF_ADS = 8;
 var INDEX_OF_FULL_DESCRIBED_AD = 0;
 
-var adParams = {
-  offer: {
-    TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
-      'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик',
-      'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
-    PRICE: {
-      MIN: 1000,
-      MAX: 1000000
-    },
-    TYPES: ['palace', 'flat', 'house', 'bungalo'],
-    ROOMS: {
-      MIN: 1,
-      MAX: 5
-    },
-    GUESTS: {
-      MIN: 1,
-      MAX: 9
-    },
-    CHECKINS: ['12:00', '13:00', '14:00'],
-    CHECKOUTS: ['12:00', '13:00', '14:00'],
-    FEATURES: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-    PHOTOS: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
-      'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
-      'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
+var offerParams = {
+  TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
+    'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик',
+    'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
+  PRICE: {
+    MIN: 1000,
+    MAX: 1000000
   },
-  LOCATION: {
-    X: {
-      START: 300,
-      END: 900
-    },
-    Y: {
-      START: 130,
-      END: 630
-    }
+  TYPES: ['palace', 'flat', 'house', 'bungalo'],
+  ROOMS: {
+    MIN: 1,
+    MAX: 5
+  },
+  GUESTS: {
+    MIN: 1,
+    MAX: 9
+  },
+  CHECKINS: ['12:00', '13:00', '14:00'],
+  CHECKOUTS: ['12:00', '13:00', '14:00'],
+  FEATURES: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
+  PHOTOS: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+    'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+    'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
+};
+
+var locationParams = {
+  X: {
+    START: 300,
+    END: 900
+  },
+  Y: {
+    START: 130,
+    END: 630
   }
 };
 
@@ -91,7 +90,7 @@ var getShuffledArray = function (array) {
 
 // Функция генерации случайного набора удобств для каждого объявления
 var getAdFeatures = function () {
-  var shuffledFeatures = getShuffledArray(adParams.offer.FEATURES);
+  var shuffledFeatures = getShuffledArray(offerParams.FEATURES);
   var randomIndex = getRandomIndexOfArray(shuffledFeatures);
 
   return shuffledFeatures.slice(0, randomIndex);
@@ -99,8 +98,8 @@ var getAdFeatures = function () {
 
 // Функция создания объявления
 var generateSimilarAd = function (adNumber) {
-  var x = getRandomNumberInRange(adParams.LOCATION.X.START, adParams.LOCATION.X.END);
-  var y = getRandomNumberInRange(adParams.LOCATION.Y.START, adParams.LOCATION.Y.END);
+  var x = getRandomNumberInRange(locationParams.X.START, locationParams.X.END);
+  var y = getRandomNumberInRange(locationParams.Y.START, locationParams.Y.END);
 
   return {
     author: {
@@ -109,15 +108,15 @@ var generateSimilarAd = function (adNumber) {
     offer: {
       title: shuffledTitles[adNumber],
       address: x + ', ' + y,
-      price: getRandomNumberInRange(adParams.offer.PRICE.MIN, adParams.offer.PRICE.MAX),
-      type: adParams.offer.TYPES[getRandomIndexOfArray(adParams.offer.TYPES)],
-      rooms: getRandomNumberInRange(adParams.offer.ROOMS.MIN, adParams.offer.ROOMS.MAX),
-      guests: getRandomNumberInRange(adParams.offer.GUESTS.MIN, adParams.offer.GUESTS.MAX),
-      checkin: adParams.offer.CHECKINS[getRandomIndexOfArray(adParams.offer.CHECKINS)],
-      checkout: adParams.offer.CHECKOUTS[getRandomIndexOfArray(adParams.offer.CHECKOUTS)],
+      price: getRandomNumberInRange(offerParams.PRICE.MIN, offerParams.PRICE.MAX),
+      type: offerParams.TYPES[getRandomIndexOfArray(offerParams.TYPES)],
+      rooms: getRandomNumberInRange(offerParams.ROOMS.MIN, offerParams.ROOMS.MAX),
+      guests: getRandomNumberInRange(offerParams.GUESTS.MIN, offerParams.GUESTS.MAX),
+      checkin: offerParams.CHECKINS[getRandomIndexOfArray(offerParams.CHECKINS)],
+      checkout: offerParams.CHECKOUTS[getRandomIndexOfArray(offerParams.CHECKOUTS)],
       features: getAdFeatures(),
       description: '',
-      photos: getShuffledArray(adParams.offer.PHOTOS)
+      photos: getShuffledArray(offerParams.PHOTOS)
     },
     location: {
       x: x,
@@ -207,7 +206,7 @@ var getCheckinCheckoutHours = function (adNumber) {
 // Функция удаления неуказанных в конкретном объявлении удобств из полного списка
 var changeFeaturesList = function (list, adNumber) {
   var currentAdFeatures = ads[adNumber].offer.features;
-  var allFeatures = adParams.offer.FEATURES;
+  var allFeatures = offerParams.FEATURES;
 
   for (var i = 0; i < allFeatures.length; i++) {
     if (!currentAdFeatures.includes(allFeatures[i])) {
@@ -265,7 +264,7 @@ var initPage = function () {
 
 var availablePictures = generateAvailablePictures();
 var shuffledPictures = getShuffledArray(availablePictures);
-var shuffledTitles = getShuffledArray(adParams.offer.TITLES);
+var shuffledTitles = getShuffledArray(offerParams.TITLES);
 var ads = generateSimilarAds();
 
 initPage();
