@@ -63,21 +63,10 @@ var getRandomNumberInRange = function (startNumber, finishNumber) {
 };
 
 // Функция получения пути к изображению
-var getPicturePath = function (number) {
-  var n = number < 10 ? '0' + number : number;
+var getPicturePath = function (elementNumber) {
+  var pathNumber = elementNumber < 10 ? '0' + elementNumber : elementNumber;
 
-  return 'img/avatars/user' + n + '.png';
-};
-
-// Функция создания массива с путями к доступным изображениям
-var generateAvailablePictures = function () {
-  var paths = [];
-
-  for (var i = 1; i <= NUM_OF_ADS; i++) {
-    paths.push(getPicturePath(i));
-  }
-
-  return paths;
+  return 'img/avatars/user' + pathNumber + '.png';
 };
 
 // Функция, возвращающая случайно перемешанную копию массива (тасование Фишера — Йетса)
@@ -103,16 +92,16 @@ var getAdFeatures = function () {
 };
 
 // Функция создания объявления
-var generateSimilarAd = function (adNumber) {
+var generateSimilarAd = function (adIndex) {
   var x = getRandomNumberInRange(locationParams.X.START, locationParams.X.END);
   var y = getRandomNumberInRange(locationParams.Y.START, locationParams.Y.END);
 
   return {
     author: {
-      avatar: shuffledPictures[adNumber]
+      avatar: getPicturePath(adIndex + 1)
     },
     offer: {
-      title: shuffledTitles[adNumber],
+      title: shuffledTitles[adIndex],
       address: x + ', ' + y,
       price: getRandomNumberInRange(offerParams.PRICE.MIN, offerParams.PRICE.MAX),
       type: offerParams.TYPES[getRandomIndexOfArray(offerParams.TYPES)],
@@ -268,8 +257,6 @@ var initPage = function () {
   map.insertBefore(generateInfoCard(INDEX_OF_FULL_DESCRIBED_AD), filtersContainer);
 };
 
-var availablePictures = generateAvailablePictures();
-var shuffledPictures = getShuffledArray(availablePictures);
 var shuffledTitles = getShuffledArray(offerParams.TITLES);
 var ads = generateSimilarAds();
 
