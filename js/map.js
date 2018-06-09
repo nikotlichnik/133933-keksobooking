@@ -154,9 +154,9 @@ var createPinElement = function (ad) {
 var createPinsFragment = function (ads) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < ads.length; i++) {
-    fragment.appendChild(createPinElement(ads[i]));
-  }
+  ads.forEach(function (item) {
+    fragment.appendChild(createPinElement(item));
+  });
 
   return fragment;
 };
