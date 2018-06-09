@@ -57,6 +57,7 @@ var filtersContainer = document.querySelector('.map__filters-container');
 var template = document.querySelector('template');
 var pinTemplate = template.content.querySelector('.map__pin');
 var cardTemplate = template.content.querySelector('.map__card');
+var featuresListTemplate = template.content.querySelector('.popup__features');
 
 // Функция, возвращающая случайный индекс элемента из массива
 var getRandomIndexOfArray = function (array) {
@@ -161,14 +162,15 @@ var createPinsFragment = function (ads) {
   return fragment;
 };
 
-// Функция очистки и заполнения списка удобств
-var changeFeaturesList = function (list, features) {
-  // Очистка списка
-  for (var i = list.children.length - 1; i >= 0; i--) {
-    list.removeChild(list.children[i]);
+// Функция удаления дочерних элементов в блоке
+var deleteChildren = function (block) {
+  for (var i = block.children.length - 1; i >= 0; i--) {
+    block.removeChild(block.children[i]);
   }
+};
 
-  // Добавление существующих удобств
+// Функция заполнения списка удобств
+var fillFeaturesList = function (list, features) {
   for (var j = 0; j < features.length; j++) {
     var featureItem = document.createElement('li');
     featureItem.classList.add('popup__feature', 'popup__feature--' + features[j]);
@@ -210,7 +212,7 @@ var generateInfoCard = function (ad) {
   card.querySelector('.popup__text--capacity').textContent = rooms + ' комнаты для ' + guests + ' гостей';
   card.querySelector('.popup__text--time').textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
   card.querySelector('.popup__description').textContent = ad.offer.description;
-  changeFeaturesList(featuresList, ad.offer.features);
+  fillFeaturesList(featuresList, ad.offer.features);
   fillPhotoList(photosList, ad.offer.photos);
 
   return card;
@@ -229,5 +231,8 @@ var initPage = function () {
   // Добавляем карточку с информацией
   map.insertBefore(generateInfoCard(ads[0]), filtersContainer);
 };
+
+// Очистка шаблона от разметки по умолчанию
+deleteChildren(featuresListTemplate);
 
 initPage();
