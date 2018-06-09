@@ -57,7 +57,7 @@ var filtersContainer = document.querySelector('.map__filters-container');
 var template = document.querySelector('template');
 var pinTemplate = template.content.querySelector('.map__pin');
 var cardTemplate = template.content.querySelector('.map__card');
-var featuresListTemplate = template.content.querySelector('.popup__features');
+var photoTemplate = template.content.querySelector('.popup__photo');
 
 // Функция, возвращающая случайный индекс элемента из массива
 var getRandomIndexOfArray = function (array) {
@@ -169,27 +169,22 @@ var deleteChildren = function (block) {
   }
 };
 
-// Функция заполнения списка удобств
-var fillFeaturesList = function (list, features) {
-  for (var j = 0; j < features.length; j++) {
-    var featureItem = document.createElement('li');
-    featureItem.classList.add('popup__feature', 'popup__feature--' + features[j]);
-    list.appendChild(featureItem);
-  }
+// Функция создания элемента из списка удобств
+var createFeatureItem = function (feature) {
+  var featureItem = document.createElement('li');
+
+  featureItem.classList.add('popup__feature', 'popup__feature--' + feature);
+
+  return featureItem;
 };
 
 // Функция заполнения списка фотографий с последующим удалением пустого шаблона
-var fillPhotoList = function (photosList, photos) {
-  var photoTemplate = photosList.querySelector('.popup__photo');
+var createPhotoElement = function (photo) {
+  var photoElement = photoTemplate.cloneNode();
 
-  // Удаление пустого шаблона из разметки
-  photosList.removeChild(photoTemplate);
+  photoElement.src = photo;
 
-  for (var i = 0; i < photos.length; i++) {
-    var photo = photoTemplate.cloneNode(true);
-    photo.src = photos[i];
-    photosList.appendChild(photo);
-  }
+  return photoElement;
 };
 
 // Функция создания фрагмента карточки с объявлением
@@ -198,11 +193,17 @@ var generateInfoCard = function (ad) {
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
 
+  // Очистка шаблона от разметки по умолчанию
+  deleteChildren(featuresList);
+  deleteChildren(photosList);
+
   var houseType = ad.offer.type;
   var rooms = ad.offer.rooms;
   var guests = ad.offer.guests;
   var checkin = ad.offer.checkin;
   var checkout = ad.offer.checkout;
+  var features = ad.offer.features;
+  var photos = ad.offer.photos;
 
   card.querySelector('.popup__avatar').src = ad.author.avatar;
   card.querySelector('.popup__title').textContent = ad.offer.title;
@@ -212,8 +213,14 @@ var generateInfoCard = function (ad) {
   card.querySelector('.popup__text--capacity').textContent = rooms + ' комнаты для ' + guests + ' гостей';
   card.querySelector('.popup__text--time').textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
   card.querySelector('.popup__description').textContent = ad.offer.description;
-  fillFeaturesList(featuresList, ad.offer.features);
-  fillPhotoList(photosList, ad.offer.photos);
+
+  features.forEach(function (feature) {
+    featuresList.appendChild(createFeatureItem(feature));
+  });
+
+  photos.forEach(function (photo) {
+    photosList.appendChild(createPhotoElement(photo));
+  });
 
   return card;
 };
@@ -232,7 +239,5 @@ var initPage = function () {
   map.insertBefore(generateInfoCard(ads[0]), filtersContainer);
 };
 
-// Очистка шаблона от разметки по умолчанию
-deleteChildren(featuresListTemplate);
 
 initPage();
