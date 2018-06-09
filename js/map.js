@@ -1,7 +1,6 @@
 'use strict';
 
 var NUM_OF_ADS = 8;
-var INDEX_OF_FULL_DESCRIBED_AD = 0;
 
 var offerParams = {
   TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
@@ -228,7 +227,7 @@ var initPage = function () {
   pinsContainer.appendChild(createPinsFragment(ads));
 
   // Добавляем карточку с информацией
-  map.insertBefore(generateInfoCard(ads[INDEX_OF_FULL_DESCRIBED_AD]), filtersContainer);
+  map.insertBefore(generateInfoCard(ads[0]), filtersContainer);
 };
 
 initPage();
