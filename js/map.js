@@ -152,10 +152,10 @@ var createPinElement = function (pinNumber) {
 };
 
 // Функция создания фрагмента с маркерами на карте
-var createPinsFragment = function () {
+var createPinsFragment = function (numberOfPins) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < NUM_OF_ADS; i++) {
+  for (var i = 0; i < numberOfPins; i++) {
     fragment.appendChild(createPinElement(i));
   }
 
@@ -223,7 +223,7 @@ var initPage = function () {
   map.classList.remove('map--faded');
 
   // Добавляем маркеры в контейнер
-  pinsContainer.appendChild(createPinsFragment());
+  pinsContainer.appendChild(createPinsFragment(NUM_OF_ADS));
 
   // Добавляем карточку с информацией
   map.insertBefore(generateInfoCard(ads[INDEX_OF_FULL_DESCRIBED_AD]), filtersContainer);
