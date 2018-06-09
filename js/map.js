@@ -118,7 +118,7 @@ var generateSimilarAd = function (adIndex) {
       checkout: offerParams.CHECKOUTS[getRandomIndexOfArray(offerParams.CHECKOUTS)],
       features: getAdFeatures(),
       description: '',
-      photos: getShuffledArray(offerParams.PHOTOS)
+      photos: offerParams.PHOTOS
     },
     location: {
       x: x,
