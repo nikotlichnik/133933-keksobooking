@@ -139,24 +139,24 @@ var generateSimilarAds = function () {
 };
 
 // Функция создания элемента маркера на карте
-var createPinElement = function (pinNumber) {
+var createPinElement = function (ad) {
   var pinElement = pinTemplate.cloneNode(true);
   var pinImage = pinElement.querySelector('img');
 
-  pinElement.style.left = (ads[pinNumber].location.x - pinParams.WIDTH / 2) + 'px';
-  pinElement.style.top = (ads[pinNumber].location.y - pinParams.HEIGHT) + 'px';
-  pinImage.src = ads[pinNumber].author.avatar;
-  pinImage.alt = ads[pinNumber].offer.title;
+  pinElement.style.left = (ad.location.x - pinParams.WIDTH / 2) + 'px';
+  pinElement.style.top = (ad.location.y - pinParams.HEIGHT) + 'px';
+  pinImage.src = ad.author.avatar;
+  pinImage.alt = ad.offer.title;
 
   return pinElement;
 };
 
 // Функция создания фрагмента с маркерами на карте
-var createPinsFragment = function (numberOfPins) {
+var createPinsFragment = function (ads) {
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < numberOfPins; i++) {
-    fragment.appendChild(createPinElement(i));
+  for (var i = 0; i < ads.length; i++) {
+    fragment.appendChild(createPinElement(ads[i]));
   }
 
   return fragment;
@@ -219,16 +219,16 @@ var generateInfoCard = function (ad) {
 
 // Функция инициализации страницы
 var initPage = function () {
+  var ads = generateSimilarAds();
+
   // Убираем приветственное сообщение
   map.classList.remove('map--faded');
 
   // Добавляем маркеры в контейнер
-  pinsContainer.appendChild(createPinsFragment(NUM_OF_ADS));
+  pinsContainer.appendChild(createPinsFragment(ads));
 
   // Добавляем карточку с информацией
   map.insertBefore(generateInfoCard(ads[INDEX_OF_FULL_DESCRIBED_AD]), filtersContainer);
 };
-
-var ads = generateSimilarAds();
 
 initPage();
