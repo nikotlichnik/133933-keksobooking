@@ -108,7 +108,7 @@ var generateSimilarAd = function (adIndex) {
       avatar: getPicturePath(adIndex + 1)
     },
     offer: {
-      title: shuffledTitles[adIndex],
+      title: offerParams.TITLES[adIndex],
       address: x + ', ' + y,
       price: getRandomNumberInRange(offerParams.PRICE.MIN, offerParams.PRICE.MAX),
       type: offerParams.TYPES[getRandomIndexOfArray(offerParams.TYPES)],
@@ -178,9 +178,8 @@ var changeFeaturesList = function (list, features) {
 };
 
 // Функция заполнения списка фотографий с последующим удалением пустого шаблона
-var fillPhotoList = function (photosList, adNumber) {
+var fillPhotoList = function (photosList, photos) {
   var photoTemplate = photosList.querySelector('.popup__photo');
-  var photos = ads[adNumber].offer.photos;
 
   // Удаление пустого шаблона из разметки
   photosList.removeChild(photoTemplate);
@@ -193,27 +192,27 @@ var fillPhotoList = function (photosList, adNumber) {
 };
 
 // Функция создания фрагмента карточки с объявлением
-var generateInfoCard = function (adNumber) {
+var generateInfoCard = function (ad) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
 
-  var houseType = ads[adNumber].offer.type;
-  var rooms = ads[adNumber].offer.rooms;
-  var guests = ads[adNumber].offer.guests;
-  var checkin = ads[adNumber].offer.checkin;
-  var checkout = ads[adNumber].offer.checkout;
+  var houseType = ad.offer.type;
+  var rooms = ad.offer.rooms;
+  var guests = ad.offer.guests;
+  var checkin = ad.offer.checkin;
+  var checkout = ad.offer.checkout;
 
-  card.querySelector('.popup__avatar').src = ads[adNumber].author.avatar;
-  card.querySelector('.popup__title').textContent = ads[adNumber].offer.title;
-  card.querySelector('.popup__text--address').textContent = ads[adNumber].offer.address;
-  card.querySelector('.popup__text--price').textContent = ads[adNumber].offer.price + '₽/ночь';
+  card.querySelector('.popup__avatar').src = ad.author.avatar;
+  card.querySelector('.popup__title').textContent = ad.offer.title;
+  card.querySelector('.popup__text--address').textContent = ad.offer.address;
+  card.querySelector('.popup__text--price').textContent = ad.offer.price + '₽/ночь';
   card.querySelector('.popup__type').textContent = offerTypesTranslation[houseType];
   card.querySelector('.popup__text--capacity').textContent = rooms + ' комнаты для ' + guests + ' гостей';
   card.querySelector('.popup__text--time').textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
-  card.querySelector('.popup__description').textContent = ads[adNumber].offer.description;
-  changeFeaturesList(featuresList, ads[adNumber].offer.features);
-  fillPhotoList(photosList, adNumber);
+  card.querySelector('.popup__description').textContent = ad.offer.description;
+  changeFeaturesList(featuresList, ad.offer.features);
+  fillPhotoList(photosList, ad.offer.photos);
 
   return card;
 };
@@ -227,10 +226,9 @@ var initPage = function () {
   pinsContainer.appendChild(createPinsFragment());
 
   // Добавляем карточку с информацией
-  map.insertBefore(generateInfoCard(INDEX_OF_FULL_DESCRIBED_AD), filtersContainer);
+  map.insertBefore(generateInfoCard(ads[INDEX_OF_FULL_DESCRIBED_AD]), filtersContainer);
 };
 
-var shuffledTitles = getShuffledArray(offerParams.TITLES);
 var ads = generateSimilarAds();
 
 initPage();
