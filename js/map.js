@@ -45,15 +45,16 @@ var NUM_OF_ADS = 8;
  */
 
 /**
- * @type {{TITLES: string[],
+ * Параметры генерируемых деталей объявлений
+ * @type {{TITLES: Array.<string>,
  * PRICE: {MIN: number, MAX: number},
- * TYPES: string[], ROOMS: {MIN: number,
- * MAX: number},
+ * TYPES: Array.<string>,
+ * ROOMS: {MIN: number, MAX: number},
  * GUESTS: {MIN: number, MAX: number},
- * CHECKINS: string[],
- * CHECKOUTS: string[],
- * FEATURES: string[],
- * PHOTOS: string[]}}
+ * CHECKINS: Array.<string>,
+ * CHECKOUTS: Array.<string>,
+ * FEATURES: Array.<string>,
+ * PHOTOS: Array.<string>}}
  */
 var offerParams = {
   TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
@@ -81,6 +82,7 @@ var offerParams = {
 };
 
 /**
+ * Параметры генерируемых местоположений объектов
  * @type {{X: {START: number, END: number}, Y: {START: number, END: number}}}
  */
 var locationParams = {
@@ -95,6 +97,7 @@ var locationParams = {
 };
 
 /**
+ * Параметры маркера на карте
  * @type {{WIDTH: number, HEIGHT: number}}
  */
 var pinParams = {
@@ -103,6 +106,7 @@ var pinParams = {
 };
 
 /**
+ * Русские названия английских типов жилья
  * @type {{flat: string, palace: string, house: string, bungalo: string}}
  */
 var offerTypesTranslation = {
@@ -253,17 +257,15 @@ var createPinsFragment = function (ads) {
 
 /**
  * Удаляет дочерние элементы
- * @param {Node} block - Элемент, в котором необходимо удалить дочерние элементы
+ * @param {HTMLElement} block - Элемент, в котором необходимо удалить дочерние элементы
  */
 var deleteChildren = function (block) {
-  for (var i = block.children.length - 1; i >= 0; i--) {
-    block.removeChild(block.children[i]);
-  }
+  block.innerHTML = '';
 };
 
 /**
  * @param {string} feature - Удобство
- * @return {Node} - Элемент списка удобств
+ * @return {HTMLLIElement} - Элемент списка удобств
  */
 var createFeatureItem = function (feature) {
   var featureItem = document.createElement('li');
