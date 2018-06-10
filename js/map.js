@@ -1,7 +1,22 @@
 'use strict';
 
+/**
+ * Число генерируемых объявлений
+ * @type {number}
+ */
 var NUM_OF_ADS = 8;
 
+/**
+ * @type {{TITLES: string[],
+ *    PRICE: {MIN: number, MAX: number},
+ *    TYPES: string[],
+ *    ROOMS: {MIN: number, MAX: number},
+ *    GUESTS: {MIN: number, MAX: number},
+ *    CHECKINS: string[],
+ *    CHECKOUTS: string[],
+ *    FEATURES: string[],
+ *    PHOTOS: string[]}}
+ */
 var offerParams = {
   TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
     'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик',
@@ -27,6 +42,9 @@ var offerParams = {
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg']
 };
 
+/**
+ * @type {{X: {START: number, END: number}, Y: {START: number, END: number}}}
+ */
 var locationParams = {
   X: {
     START: 300,
@@ -38,11 +56,17 @@ var locationParams = {
   }
 };
 
+/**
+ * @type {{WIDTH: number, HEIGHT: number}}
+ */
 var pinParams = {
   WIDTH: 50,
   HEIGHT: 70
 };
 
+/**
+ * @type {{flat: string, palace: string, house: string, bungalo: string}}
+ */
 var offerTypesTranslation = {
   flat: 'Квартира',
   palace: 'Дворец',
@@ -59,24 +83,38 @@ var pinTemplate = template.content.querySelector('.map__pin');
 var cardTemplate = template.content.querySelector('.map__card');
 var photoTemplate = template.content.querySelector('.popup__photo');
 
-// Функция, возвращающая случайный индекс элемента из массива
+/**
+ * @param {Array} array
+ * @return {number} - Индекс случайного элемента из массива
+ */
 var getRandomIndexOfArray = function (array) {
   return Math.floor(Math.random() * array.length);
 };
 
-// Функция генерации случайного числа в заданном диапазоне, включая концы интервала
+/**
+ * @param {number} startNumber - Нижняя граница диапазона
+ * @param {number} finishNumber - Верхняя граница диапазона
+ * @return {number} - Случайное число в заданном диапазоне, включая концы интервала
+ */
 var getRandomNumberInRange = function (startNumber, finishNumber) {
   return startNumber + Math.round(Math.random() * (finishNumber - startNumber));
 };
 
-// Функция получения пути к изображению
+/**
+ * @param {number} elementNumber - Номер изображения
+ * @return {string} - Путь к изображению с указанным номером
+ */
 var getPicturePath = function (elementNumber) {
   var pathNumber = elementNumber < 10 ? '0' + elementNumber : elementNumber;
 
   return 'img/avatars/user' + pathNumber + '.png';
 };
 
-// Функция, возвращающая случайно перемешанную копию массива (тасование Фишера — Йетса)
+/**
+ * Возвращает случайно перемешанную копию массива (тасование Фишера — Йетса)
+ * @param {Array} array
+ * @return {Array} - Перемешанная копия массива
+ */
 var getShuffledArray = function (array) {
   var shuffledArray = array.slice(0);
 
@@ -90,7 +128,9 @@ var getShuffledArray = function (array) {
   return shuffledArray;
 };
 
-// Функция генерации случайного набора удобств для каждого объявления
+/**
+ * @return {string[]} - Случайный набор удобств
+ */
 var getAdFeatures = function () {
   var shuffledFeatures = getShuffledArray(offerParams.FEATURES);
   var randomIndex = getRandomIndexOfArray(shuffledFeatures);
@@ -98,7 +138,10 @@ var getAdFeatures = function () {
   return shuffledFeatures.slice(0, randomIndex);
 };
 
-// Функция создания объявления
+/**
+ * @param {number} adIndex - Индекс генерируемого объявления
+ * @return {Object} - Объявление
+ */
 var generateSimilarAd = function (adIndex) {
   var x = getRandomNumberInRange(locationParams.X.START, locationParams.X.END);
   var y = getRandomNumberInRange(locationParams.Y.START, locationParams.Y.END);
@@ -127,7 +170,9 @@ var generateSimilarAd = function (adIndex) {
   };
 };
 
-// Функция создания массива похожих объявлений
+/**
+ * @return {Object[]} - Массив с объектами, описывающими объявления
+ */
 var generateSimilarAds = function () {
   var randomAds = [];
 
@@ -138,7 +183,10 @@ var generateSimilarAds = function () {
   return randomAds;
 };
 
-// Функция создания элемента маркера на карте
+/**
+ * @param {Object} ad - Объявление
+ * @return {Node} - Маркер для карты
+ */
 var createPinElement = function (ad) {
   var pinElement = pinTemplate.cloneNode(true);
   var pinImage = pinElement.querySelector('img');
@@ -151,7 +199,10 @@ var createPinElement = function (ad) {
   return pinElement;
 };
 
-// Функция создания фрагмента с маркерами на карте
+/**
+ * @param {Object[]} ads - Массив объявлений
+ * @return {DocumentFragment} - Фрагмент с маркерами на карте
+ */
 var createPinsFragment = function (ads) {
   var fragment = document.createDocumentFragment();
 
@@ -162,14 +213,20 @@ var createPinsFragment = function (ads) {
   return fragment;
 };
 
-// Функция удаления дочерних элементов в блоке
+/**
+ * Удаляет дочерние элементы
+ * @param {Node} block - Элемент, в котором необходимо удалить дочерние элементы
+ */
 var deleteChildren = function (block) {
   for (var i = block.children.length - 1; i >= 0; i--) {
     block.removeChild(block.children[i]);
   }
 };
 
-// Функция создания элемента из списка удобств
+/**
+ * @param {string} feature - Удобство
+ * @return {Node} - Элемент списка удобств
+ */
 var createFeatureItem = function (feature) {
   var featureItem = document.createElement('li');
 
@@ -178,7 +235,10 @@ var createFeatureItem = function (feature) {
   return featureItem;
 };
 
-// Функция заполнения списка фотографий с последующим удалением пустого шаблона
+/**
+ * @param {string} photo - Путь к фотографии
+ * @return {Node} - Элемент c фотографией
+ */
 var createPhotoElement = function (photo) {
   var photoElement = photoTemplate.cloneNode();
 
@@ -187,7 +247,10 @@ var createPhotoElement = function (photo) {
   return photoElement;
 };
 
-// Функция создания фрагмента карточки с объявлением
+/**
+ * @param {Object} ad - Объявление
+ * @return {Node} - Элемент карточки с объявлением
+ */
 var generateInfoCard = function (ad) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
@@ -225,7 +288,9 @@ var generateInfoCard = function (ad) {
   return card;
 };
 
-// Функция инициализации страницы
+/**
+ * Инициализирует страницу
+ */
 var initPage = function () {
   var ads = generateSimilarAds();
 
@@ -238,6 +303,5 @@ var initPage = function () {
   // Добавляем карточку с информацией
   map.insertBefore(generateInfoCard(ads[0]), filtersContainer);
 };
-
 
 initPage();
