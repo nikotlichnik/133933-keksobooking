@@ -7,7 +7,53 @@
 var NUM_OF_ADS = 8;
 
 /**
- * @type {{TITLES: string[], PRICE: {MIN: number, MAX: number}, TYPES: string[], ROOMS: {MIN: number, MAX: number}, GUESTS: {MIN: number, MAX: number}, CHECKINS: string[], CHECKOUTS: string[], FEATURES: string[], PHOTOS: string[]}}
+ * Объект, описывающий автора объявления
+ * @typedef {Object} author
+ * @property {string} avatar - Путь к файлу аватарки
+ */
+
+/**
+ * Объект, описывающий детали объявления
+ * @typedef {Object} offer
+ * @property {string} title - Заголовок
+ * @property {string} address - Адрес жилья
+ * @property {number} price - Цена за ночь
+ * @property {string} type - Тип жилья
+ * @property {number} rooms - Количество комнат
+ * @property {number} guests - Количество размещаемых гостей
+ * @property {string} checkin - Время заселения
+ * @property {string} checkout - Время выселения
+ * @property {Array.<string>} features - Удобства в жилье
+ * @property {string} description - Описание жилья
+ * @property {Array.<string>} photos - Пути к фотографиям жилья
+ */
+
+/**
+ * Объект, описывающий местоположение объекта
+ * @typedef {Object} location
+ * @property {number} x - Координата x
+ * @property {number} y - Координата y
+ */
+
+
+/**
+ * Объект, описывающий объявление
+ * @typedef {Object} Ad
+ * @property {Object} author
+ * @property {Object} offer
+ * @property {Object} location
+ */
+
+/**
+ * @type {{TITLES: string[],
+ * PRICE: {MIN: number, MAX: number},
+ * TYPES: string[], ROOMS: {MIN: number,
+ * MAX: number},
+ * GUESTS: {MIN: number, MAX: number},
+ * CHECKINS: string[],
+ * CHECKOUTS: string[],
+ * FEATURES: string[],
+ * PHOTOS: string[]}}
  */
 var offerParams = {
   TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
@@ -121,7 +167,7 @@ var getShuffledArray = function (array) {
 };
 
 /**
- * @return {string[]} - Случайный набор удобств
+ * @return {Array.<string>} - Случайный набор удобств
  */
 var getAdFeatures = function () {
   var shuffledFeatures = getShuffledArray(offerParams.FEATURES);
@@ -132,7 +178,7 @@ var getAdFeatures = function () {
 
 /**
  * @param {number} adIndex - Индекс генерируемого объявления
- * @return {Object} - Объявление
+ * @return {Ad}
  */
 var generateSimilarAd = function (adIndex) {
   var x = getRandomNumberInRange(locationParams.X.START, locationParams.X.END);
@@ -163,7 +209,7 @@ var generateSimilarAd = function (adIndex) {
 };
 
 /**
- * @return {Object[]} - Массив с объектами, описывающими объявления
+ * @return {Array.<Ad>} - Массив с объектами, описывающими объявления
  */
 var generateSimilarAds = function () {
   var randomAds = [];
@@ -176,7 +222,7 @@ var generateSimilarAds = function () {
 };
 
 /**
- * @param {Object} ad - Объявление
+ * @param {Ad} ad - Объявление
  * @return {Node} - Маркер для карты
  */
 var createPinElement = function (ad) {
@@ -192,7 +238,7 @@ var createPinElement = function (ad) {
 };
 
 /**
- * @param {Object[]} ads - Массив объявлений
+ * @param {Array.<Ad>} ads - Массив объявлений
  * @return {DocumentFragment} - Фрагмент с маркерами на карте
  */
 var createPinsFragment = function (ads) {
@@ -240,7 +286,7 @@ var createPhotoElement = function (photo) {
 };
 
 /**
- * @param {Object} ad - Объявление
+ * @param {Ad} ad - Объявление
  * @return {Node} - Элемент карточки с объявлением
  */
 var generateInfoCard = function (ad) {
