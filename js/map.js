@@ -300,8 +300,8 @@ var createPhotoElement = function (photo) {
   var photoElement = document.createElement('img');
 
   photoElement.classList.add(photoParams.CLASS_NAME);
-  photoElement.style.width = photoParams.WIDTH;
-  photoElement.style.height = photoParams.HEIGHT;
+  photoElement.style.width = photoParams.WIDTH + 'px';
+  photoElement.style.height = photoParams.HEIGHT + 'px';
   photoElement.alt = photoParams.ALT;
   photoElement.src = photo;
 
