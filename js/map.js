@@ -35,7 +35,6 @@ var NUM_OF_ADS = 8;
  * @property {number} y - Координата y
  */
 
-
 /**
  * Объект, описывающий объявление
  * @typedef {Object} Ad
@@ -45,16 +44,24 @@ var NUM_OF_ADS = 8;
  */
 
 /**
+ * Объект, описывающий промежуток значений
+ * @typedef {Object} Range
+ * @property {number} MIN
+ * @property {number} MAX
+ */
+
+/**
  * Параметры генерируемых деталей объявлений
- * @type {{TITLES: Array.<string>,
- * PRICE: {MIN: number, MAX: number},
- * TYPES: Array.<string>,
- * ROOMS: {MIN: number, MAX: number},
- * GUESTS: {MIN: number, MAX: number},
- * CHECKINS: Array.<string>,
- * CHECKOUTS: Array.<string>,
- * FEATURES: Array.<string>,
- * PHOTOS: Array.<string>}}
+ * @typedef {Object} OfferParams
+ * @property {Array.<string>} TITLES
+ * @property {Range} PRICE
+ * @property {Array.<string>} TYPES
+ * @property {Range} ROOMS
+ * @property {Range} GUESTS
+ * @property {Array.<string>} CHECKINS
+ * @property {Array.<string>} CHECKOUTS
+ * @property {Array.<string>} FEATURES
+ * @property {Array.<string>} PHOTOS
  */
 var offerParams = {
   TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
@@ -83,22 +90,26 @@ var offerParams = {
 
 /**
  * Параметры генерируемых местоположений объектов
- * @type {{X: {START: number, END: number}, Y: {START: number, END: number}}}
+ * @typedef {Object} LocationParams
+ * @property {Range} X
+ * @property {Range} Y
  */
 var locationParams = {
   X: {
-    START: 300,
-    END: 900
+    MIN: 300,
+    MAX: 900
   },
   Y: {
-    START: 130,
-    END: 630
+    MIN: 130,
+    MAX: 630
   }
 };
 
 /**
  * Параметры маркера на карте
- * @type {{WIDTH: number, HEIGHT: number}}
+ * @typedef {Object} PinParams
+ * @property {number} WIDTH
+ * @property {number} HEIGHT
  */
 var pinParams = {
   WIDTH: 50,
@@ -107,7 +118,11 @@ var pinParams = {
 
 /**
  * Параметры фотографии жилья
- * @type {{WIDTH: number, HEIGHT: number, ALT: string, CLASS_NAME: string}}
+ * @typedef {Object} PhotoParams
+ * @property {number} WIDTH
+ * @property {number} HEIGHT
+ * @property {string} ALT
+ * @property {string} CLASS_NAME
  */
 var photoParams = {
   WIDTH: 45,
@@ -118,7 +133,7 @@ var photoParams = {
 
 /**
  * Русские названия английских типов жилья
- * @type {{flat: string, palace: string, house: string, bungalo: string}}
+ * @enum {string}
  */
 var offerTypesTranslation = {
   flat: 'Квартира',
@@ -195,8 +210,8 @@ var getAdFeatures = function () {
  * @return {Ad}
  */
 var generateSimilarAd = function (adIndex) {
-  var x = getRandomNumberInRange(locationParams.X.START, locationParams.X.END);
-  var y = getRandomNumberInRange(locationParams.Y.START, locationParams.Y.END);
+  var x = getRandomNumberInRange(locationParams.X.MIN, locationParams.X.MAX);
+  var y = getRandomNumberInRange(locationParams.Y.MIN, locationParams.Y.MAX);
 
   return {
     author: {
