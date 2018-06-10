@@ -8,13 +8,13 @@ var NUM_OF_ADS = 8;
 
 /**
  * Объект, описывающий автора объявления
- * @typedef {Object} author
+ * @typedef {Object} Author
  * @property {string} avatar - Путь к файлу аватарки
  */
 
 /**
  * Объект, описывающий детали объявления
- * @typedef {Object} offer
+ * @typedef {Object} Offer
  * @property {string} title - Заголовок
  * @property {string} address - Адрес жилья
  * @property {number} price - Цена за ночь
@@ -30,7 +30,7 @@ var NUM_OF_ADS = 8;
 
 /**
  * Объект, описывающий местоположение объекта
- * @typedef {Object} location
+ * @typedef {Object} Location
  * @property {number} x - Координата x
  * @property {number} y - Координата y
  */
@@ -39,9 +39,9 @@ var NUM_OF_ADS = 8;
 /**
  * Объект, описывающий объявление
  * @typedef {Object} Ad
- * @property {Object} author
- * @property {Object} offer
- * @property {Object} location
+ * @property {Author} author
+ * @property {Offer} offer
+ * @property {Location} location
  */
 
 /**
@@ -106,6 +106,17 @@ var pinParams = {
 };
 
 /**
+ * Параметры фотографии жилья
+ * @type {{WIDTH: number, HEIGHT: number, ALT: string, CLASS_NAME: string}}
+ */
+var photoParams = {
+  WIDTH: 45,
+  HEIGHT: 40,
+  ALT: 'Фотография жилья',
+  CLASS_NAME: 'popup__photo'
+};
+
+/**
  * Русские названия английских типов жилья
  * @type {{flat: string, palace: string, house: string, bungalo: string}}
  */
@@ -123,7 +134,6 @@ var filtersContainer = document.querySelector('.map__filters-container');
 var template = document.querySelector('template');
 var pinTemplate = template.content.querySelector('.map__pin');
 var cardTemplate = template.content.querySelector('.map__card');
-var photoTemplate = template.content.querySelector('.popup__photo');
 
 /**
  * @param {Array} array
@@ -256,14 +266,6 @@ var createPinsFragment = function (ads) {
 };
 
 /**
- * Удаляет дочерние элементы
- * @param {HTMLElement} block - Элемент, в котором необходимо удалить дочерние элементы
- */
-var deleteChildren = function (block) {
-  block.innerHTML = '';
-};
-
-/**
  * @param {string} feature - Удобство
  * @return {HTMLLIElement} - Элемент списка удобств
  */
@@ -280,8 +282,12 @@ var createFeatureItem = function (feature) {
  * @return {Node} - Элемент c фотографией
  */
 var createPhotoElement = function (photo) {
-  var photoElement = photoTemplate.cloneNode();
+  var photoElement = document.createElement('img');
 
+  photoElement.classList.add(photoParams.CLASS_NAME);
+  photoElement.style.width = photoParams.WIDTH;
+  photoElement.style.height = photoParams.HEIGHT;
+  photoElement.alt = photoParams.ALT;
   photoElement.src = photo;
 
   return photoElement;
@@ -295,10 +301,6 @@ var generateInfoCard = function (ad) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
-
-  // Очистка шаблона от разметки по умолчанию
-  deleteChildren(featuresList);
-  deleteChildren(photosList);
 
   var houseType = ad.offer.type;
   var rooms = ad.offer.rooms;
