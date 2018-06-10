@@ -7,15 +7,7 @@
 var NUM_OF_ADS = 8;
 
 /**
- * @type {{TITLES: string[],
- *    PRICE: {MIN: number, MAX: number},
- *    TYPES: string[],
- *    ROOMS: {MIN: number, MAX: number},
- *    GUESTS: {MIN: number, MAX: number},
- *    CHECKINS: string[],
- *    CHECKOUTS: string[],
- *    FEATURES: string[],
- *    PHOTOS: string[]}}
+ * @type {{TITLES: string[], PRICE: {MIN: number, MAX: number}, TYPES: string[], ROOMS: {MIN: number, MAX: number}, GUESTS: {MIN: number, MAX: number}, CHECKINS: string[], CHECKOUTS: string[], FEATURES: string[], PHOTOS: string[]}}
  */
 var offerParams = {
   TITLES: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец',
