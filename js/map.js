@@ -7,6 +7,11 @@
 var NUM_OF_ADS = 8;
 
 /**
+ * @type {number}
+ */
+var ESC_KEYCODE = 27;
+
+/**
  * Объект, описывающий автора объявления
  * @typedef {Object} Author
  * @property {string} avatar - Путь к файлу аватарки
@@ -275,6 +280,7 @@ var createPinElement = function (ad) {
   var pinElement = pinTemplate.cloneNode(true);
   var pinImage = pinElement.querySelector('img');
 
+  pinElement.addEventListener('click', pinClickHandler);
   pinElement.style.left = (ad.location.x - pinParams.WIDTH / 2) + 'px';
   pinElement.style.top = (ad.location.y - pinParams.HEIGHT) + 'px';
   pinImage.src = ad.author.avatar;
@@ -333,6 +339,7 @@ var generateInfoCard = function (ad) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
+  var closeCardButton = card.querySelector('.popup__close');
 
   var houseType = ad.offer.type;
   var rooms = ad.offer.rooms;
@@ -359,6 +366,8 @@ var generateInfoCard = function (ad) {
     photosList.appendChild(createPhotoElement(photo));
   });
 
+  closeCardButton.addEventListener('click', closeCardButtonClickHandler);
+
   return card;
 };
 
@@ -376,9 +385,57 @@ var getAddressValue = function (pointer) {
 };
 
 /**
+ * Показывает карточку с информацией об объявлении
+ * @param {Event} evt
+ */
+var pinClickHandler = function (evt) {
+  var target = evt.currentTarget;
+  var pinImage = target.querySelector('img');
+  var pinImagePath = pinImage.src;
+  var openedCard = map.querySelector('.map__card');
+
+  // Удаляем из DOM открытую карточку, если такая есть
+  if (openedCard) {
+    openedCard.parentNode.removeChild(openedCard);
+  }
+
+  // Получаем "Id" пользователя из адреса аватарки
+  var userId = parseInt(pinImagePath.match(/\d+\.png/g)[0], 10);
+
+  // Добавляем карточку с информацией
+  map.insertBefore(generateInfoCard(ads[userId - 1]), filtersContainer);
+
+  document.addEventListener('keydown', EscapeKeyPressHandler);
+};
+
+/**
+ * Закрывает карточку с информацией об объявлении
+ * @param {Event} evt
+ */
+var closeCardButtonClickHandler = function (evt) {
+  var openedCard = evt.currentTarget.parentNode;
+
+  map.removeChild(openedCard);
+  document.removeEventListener('keydown', EscapeKeyPressHandler);
+};
+
+/**
+ * Закрывает карточку по нажатию Escape на клавиатуре
+ * @param {Event} evt
+ */
+var EscapeKeyPressHandler = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    var openedCard = map.querySelector('.map__card');
+
+    openedCard.parentNode.removeChild(openedCard);
+    document.removeEventListener('keydown', EscapeKeyPressHandler);
+  }
+};
+
+/**
  * Переводит страницу в активное состояние
  */
-var addressPointerClickHandler = function () {
+var addressPointerFirstClickHandler = function () {
   // Убираем приветственное сообщение
   map.classList.remove('map--faded');
 
@@ -387,22 +444,21 @@ var addressPointerClickHandler = function () {
   adFieldsets.forEach(function (item) {
     item.disabled = false;
   });
+
+  // Добавляем маркеры в контейнер
+  pinsContainer.appendChild(createPinsFragment(ads));
+
+  // Удаляем данный обработчик
+  addressPointer.removeEventListener('mouseup', addressPointerFirstClickHandler);
 };
 
 /**
  * Инициализирует страницу
  */
 var initPage = function () {
-  var ads = generateSimilarAds();
-
-  addressPointer.addEventListener('mouseup', addressPointerClickHandler);
+  addressPointer.addEventListener('mouseup', addressPointerFirstClickHandler);
   addressField.value = getAddressValue(addressPointer);
-
-  // Добавляем маркеры в контейнер
-  pinsContainer.appendChild(createPinsFragment(ads));
-
-  // Добавляем карточку с информацией
-  map.insertBefore(generateInfoCard(ads[0]), filtersContainer);
 };
 
+var ads = generateSimilarAds();
 initPage();
