@@ -143,8 +143,11 @@ var offerTypesTranslation = {
 };
 
 var map = document.querySelector('.map');
+var addressPointer = map.querySelector('.map__pin--main');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
+var adForm = document.querySelector('.ad-form');
+var adFieldsets = adForm.querySelectorAll('.ad-form__element');
 
 var template = document.querySelector('template');
 var pinTemplate = template.content.querySelector('.map__pin');
@@ -346,13 +349,26 @@ var generateInfoCard = function (ad) {
 };
 
 /**
+ * Переводит страницу в активное состояние
+ */
+var addressPointerClickHandler = function () {
+  // Убираем приветственное сообщение
+  map.classList.remove('map--faded');
+
+  // Активируем элементы формы заполнения информации об объявлении
+  adForm.classList.remove('ad-form--disabled');
+  adFieldsets.forEach(function (item) {
+    item.disabled = false;
+  });
+};
+
+/**
  * Инициализирует страницу
  */
 var initPage = function () {
   var ads = generateSimilarAds();
 
-  // Убираем приветственное сообщение
-  map.classList.remove('map--faded');
+  addressPointer.addEventListener('mouseup', addressPointerClickHandler);
 
   // Добавляем маркеры в контейнер
   pinsContainer.appendChild(createPinsFragment(ads));
