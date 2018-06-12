@@ -339,6 +339,7 @@ var generateInfoCard = function (ad) {
   var card = cardTemplate.cloneNode(true);
   var featuresList = card.querySelector('.popup__features');
   var photosList = card.querySelector('.popup__photos');
+  var adDescriptionBlock = card.querySelector('.popup__description');
   var closeCardButton = card.querySelector('.popup__close');
 
   var houseType = ad.offer.type;
@@ -348,6 +349,7 @@ var generateInfoCard = function (ad) {
   var checkout = ad.offer.checkout;
   var features = ad.offer.features;
   var photos = ad.offer.photos;
+  var description = ad.offer.description;
 
   card.querySelector('.popup__avatar').src = ad.author.avatar;
   card.querySelector('.popup__title').textContent = ad.offer.title;
@@ -356,15 +358,28 @@ var generateInfoCard = function (ad) {
   card.querySelector('.popup__type').textContent = offerTypesTranslation[houseType];
   card.querySelector('.popup__text--capacity').textContent = rooms + ' комнаты для ' + guests + ' гостей';
   card.querySelector('.popup__text--time').textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
-  card.querySelector('.popup__description').textContent = ad.offer.description;
 
-  features.forEach(function (feature) {
-    featuresList.appendChild(createFeatureItem(feature));
-  });
+  if (description) {
+    adDescriptionBlock.textContent = description;
+  } else {
+    card.removeChild(adDescriptionBlock);
+  }
 
-  photos.forEach(function (photo) {
-    photosList.appendChild(createPhotoElement(photo));
-  });
+  if (features.length !== 0) {
+    features.forEach(function (feature) {
+      featuresList.appendChild(createFeatureItem(feature));
+    });
+  } else {
+    card.removeChild(featuresList);
+  }
+
+  if (photos.length !== 0) {
+    photos.forEach(function (photo) {
+      photosList.appendChild(createPhotoElement(photo));
+    });
+  } else {
+    card.removeChild(photosList);
+  }
 
   closeCardButton.addEventListener('click', closeCardButtonClickHandler);
 
