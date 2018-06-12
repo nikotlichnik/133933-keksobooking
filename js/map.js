@@ -117,6 +117,15 @@ var pinParams = {
 };
 
 /**
+ * Параметры маркера выбора адреса на карте
+ * @type {PinParams}
+ */
+var addressPointerParams = {
+  WIDTH: 40,
+  HEIGHT: 44
+};
+
+/**
  * Параметры фотографии жилья
  * @typedef {Object} PhotoParams
  * @property {number} WIDTH
@@ -147,6 +156,11 @@ var addressPointer = map.querySelector('.map__pin--main');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
 var adForm = document.querySelector('.ad-form');
+var addressField = adForm.querySelector('#address');
+
+/**
+ * @type {NodeListOf<HTMLFieldSetElement>}
+ */
 var adFieldsets = adForm.querySelectorAll('.ad-form__element');
 
 var template = document.querySelector('template');
@@ -349,6 +363,19 @@ var generateInfoCard = function (ad) {
 };
 
 /**
+ * @param {HTMLElement} pointer
+ * @return {string} - значение поля для ввода адреса
+ */
+var getAddressValue = function (pointer) {
+  var pointerX = parseInt(pointer.style.left, 10);
+  var pointerY = parseInt(pointer.style.top, 10);
+  var x = pointerX + addressPointerParams.WIDTH / 2;
+  var y = pointerY + addressPointerParams.HEIGHT;
+
+  return x + ', ' + y;
+};
+
+/**
  * Переводит страницу в активное состояние
  */
 var addressPointerClickHandler = function () {
@@ -369,6 +396,7 @@ var initPage = function () {
   var ads = generateSimilarAds();
 
   addressPointer.addEventListener('mouseup', addressPointerClickHandler);
+  addressField.value = getAddressValue(addressPointer);
 
   // Добавляем маркеры в контейнер
   pinsContainer.appendChild(createPinsFragment(ads));
