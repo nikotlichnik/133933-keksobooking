@@ -123,11 +123,17 @@ var pinParams = {
 
 /**
  * Параметры маркера выбора адреса на карте
- * @type {PinParams}
+ * @type {Object} AddressPointerParams
+ * @property {number} WIDTH
+ * @property {number} HEIGHT
+ * @property {number} DEFAULT_X
+ * @property {number} DEFAULT_Y
  */
 var addressPointerParams = {
   WIDTH: 40,
-  HEIGHT: 44
+  HEIGHT: 44,
+  DEFAULT_X: 570,
+  DEFAULT_Y: 375
 };
 
 /**
@@ -162,10 +168,6 @@ var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
 var adForm = document.querySelector('.ad-form');
 var addressField = adForm.querySelector('#address');
-
-/**
- * @type {NodeListOf<HTMLFieldSetElement>}
- */
 var adFieldsets = adForm.querySelectorAll('.ad-form__element');
 
 var template = document.querySelector('template');
@@ -388,15 +390,14 @@ var generateInfoCard = function (ad) {
 
 /**
  * @param {HTMLElement} pointer
- * @return {string} - значение поля для ввода адреса
  */
-var getAddressValue = function (pointer) {
-  var pointerX = parseInt(pointer.style.left, 10);
-  var pointerY = parseInt(pointer.style.top, 10);
+var setAddressValue = function (pointer) {
+  var pointerX = pointer.style.left ? parseInt(pointer.style.left, 10) : addressPointerParams.DEFAULT_X;
+  var pointerY = pointer.style.top ? parseInt(pointer.style.top, 10) : addressPointerParams.DEFAULT_Y;
   var x = pointerX + addressPointerParams.WIDTH / 2;
   var y = pointerY + addressPointerParams.HEIGHT;
 
-  return x + ', ' + y;
+  addressField.value = x + ', ' + y;
 };
 
 /**
@@ -477,7 +478,8 @@ var initPage = function () {
   });
 
   addressPointer.addEventListener('mouseup', addressPointerFirstClickHandler);
-  addressField.value = getAddressValue(addressPointer);
+
+  setAddressValue(addressPointer);
 };
 
 var ads = generateSimilarAds();
