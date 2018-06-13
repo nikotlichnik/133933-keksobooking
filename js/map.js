@@ -471,6 +471,11 @@ var addressPointerFirstClickHandler = function () {
  * Инициализирует страницу
  */
 var initPage = function () {
+  // Блокируем поля форм
+  adFieldsets.forEach(function (item) {
+    item.disabled = true;
+  });
+
   addressPointer.addEventListener('mouseup', addressPointerFirstClickHandler);
   addressField.value = getAddressValue(addressPointer);
 };
