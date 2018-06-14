@@ -386,7 +386,9 @@ var generateInfoCard = function (ad) {
     card.removeChild(photosList);
   }
 
-  closeCardButton.addEventListener('click', closeCardButtonClickHandler);
+  closeCardButton.addEventListener('click', function () {
+    closeCard();
+  });
 
   return card;
 };
@@ -403,43 +405,30 @@ var setAddressValue = function (pointer) {
   addressField.value = x + ', ' + y;
 };
 
+var EscapeKeyPressHandler = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeCard();
+  }
+};
+
 /**
- * Открывает карточку с информацией об объявлении
- * @param {Ad} ad
+ * @param {Ad} ad - Объявление
  */
 var openCard = function (ad) {
   map.insertBefore(generateInfoCard(ad), filtersContainer);
   document.addEventListener('keydown', EscapeKeyPressHandler);
 };
 
-/**
- * Закрывает карточку с информацией об объявлении
- * @param {Event} evt
- */
-var closeCardButtonClickHandler = function (evt) {
-  var openedCard = evt.currentTarget.parentNode;
+var closeCard = function () {
+  var openedCard = map.querySelector('.map__card');
 
-  map.removeChild(openedCard);
+  openedCard.parentNode.removeChild(openedCard);
   document.removeEventListener('keydown', EscapeKeyPressHandler);
 };
 
-/**
- * Закрывает карточку по нажатию Escape на клавиатуре
- * @param {Event} evt
- */
-var EscapeKeyPressHandler = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    var openedCard = map.querySelector('.map__card');
+var activatePage = function () {
+  var ads = generateSimilarAds();
 
-    openedCard.parentNode.removeChild(openedCard);
-    document.removeEventListener('keydown', EscapeKeyPressHandler);
-  }
-};
-
-/**
- * Переводит страницу в активное состояние
- */
-var addressPointerFirstClickHandler = function () {
   // Убираем приветственное сообщение
   map.classList.remove('map--faded');
 
@@ -451,8 +440,11 @@ var addressPointerFirstClickHandler = function () {
 
   // Добавляем маркеры в контейнер
   pinsContainer.appendChild(createPinsFragment(ads));
+};
 
-  // Удаляем данный обработчик
+var addressPointerFirstClickHandler = function () {
+  activatePage();
+
   addressPointer.removeEventListener('mouseup', addressPointerFirstClickHandler);
 };
 
@@ -465,7 +457,7 @@ var initPage = function () {
     item.disabled = true;
   });
 
-  // Следим за тем, чтобы на карте было не более одной открытой карточки с информацией
+  // Следим за тем, чтобы на карте не было двух открытых карточек с информацией
   map.addEventListener('click', function () {
     var openedCard = map.querySelectorAll('.map__card');
 
@@ -479,5 +471,4 @@ var initPage = function () {
   setAddressValue(addressPointer);
 };
 
-var ads = generateSimilarAds();
 initPage();
