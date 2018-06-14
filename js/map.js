@@ -133,6 +133,12 @@ var addressPointerParams = {
 };
 
 /**
+ * Содержит ссылку на открытую карточку с информацией
+ * @type {Node}
+ */
+var activeCard;
+
+/**
  * Параметры фотографии жилья
  * @typedef {Object} PhotoParams
  * @property {number} WIDTH
@@ -383,7 +389,7 @@ var generateInfoCard = function (ad) {
   }
 
   closeCardButton.addEventListener('click', function () {
-    closeCard();
+    closeActiveCard();
   });
 
   return card;
@@ -409,22 +415,31 @@ var setAddressValue = function (coordinates) {
 
 var EscapeKeyPressHandler = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
-    closeCard();
+    closeActiveCard();
   }
 };
 
 /**
+ * Закрывает открытую карточку, если такая есть, и открывает новую
  * @param {Ad} ad - Объявление
  */
 var openCard = function (ad) {
-  map.insertBefore(generateInfoCard(ad), filtersContainer);
+  if (activeCard) {
+    closeActiveCard();
+  }
+  activeCard = generateInfoCard(ad);
+
+  map.insertBefore(activeCard, filtersContainer);
   document.addEventListener('keydown', EscapeKeyPressHandler);
 };
 
-var closeCard = function () {
-  var openedCard = map.querySelector('.map__card');
+/**
+ * Закрывает открытую карточку и сбрасывает ссылку на неё
+ */
+var closeActiveCard = function () {
+  activeCard.parentNode.removeChild(activeCard);
+  activeCard = undefined;
 
-  openedCard.parentNode.removeChild(openedCard);
   document.removeEventListener('keydown', EscapeKeyPressHandler);
 };
 
@@ -444,10 +459,10 @@ var activatePage = function () {
   pinsContainer.appendChild(createPinsFragment(ads));
 };
 
-var addressPointerFirstClickHandler = function () {
+var mainPinClickHandler = function () {
   activatePage();
 
-  addressPointer.removeEventListener('mouseup', addressPointerFirstClickHandler);
+  addressPointer.removeEventListener('mouseup', mainPinClickHandler);
 };
 
 /**
@@ -459,16 +474,7 @@ var initPage = function () {
     item.disabled = true;
   });
 
-  // Следим за тем, чтобы на карте не было двух открытых карточек с информацией
-  map.addEventListener('click', function () {
-    var openedCard = map.querySelectorAll('.map__card');
-
-    if (openedCard.length === 2) {
-      map.removeChild(openedCard[0]);
-    }
-  });
-
-  addressPointer.addEventListener('mouseup', addressPointerFirstClickHandler);
+  addressPointer.addEventListener('mouseup', mainPinClickHandler);
 
   setAddressValue(getCoordinates(addressPointer));
 };
