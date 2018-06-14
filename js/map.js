@@ -139,6 +139,12 @@ var mainPinParams = {
 var activeCard;
 
 /**
+ * Содержит ссылку на пин, карточка которого открыта
+ * @type {Node}
+ */
+var activePin;
+
+/**
  * Параметры фотографии жилья
  * @typedef {Object} PhotoParams
  * @property {number} WIDTH
@@ -285,6 +291,7 @@ var createPinElement = function (ad) {
   var pinImage = pinElement.querySelector('img');
 
   pinElement.addEventListener('click', function () {
+    setActivePin(pinElement);
     openCard(ad);
   });
 
@@ -413,12 +420,6 @@ var setAddressValue = function (coordinates) {
   addressField.value = coordinates.x + ', ' + coordinates.y;
 };
 
-var EscapeKeyPressHandler = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
-    closeActiveCard();
-  }
-};
-
 /**
  * Закрывает открытую карточку, если такая есть, и открывает новую
  * @param {Ad} ad - Объявление
@@ -430,7 +431,7 @@ var openCard = function (ad) {
   activeCard = generateInfoCard(ad);
 
   map.insertBefore(activeCard, filtersContainer);
-  document.addEventListener('keydown', EscapeKeyPressHandler);
+  document.addEventListener('keydown', escapeKeyPressHandler);
 };
 
 /**
@@ -440,7 +441,40 @@ var closeActiveCard = function () {
   activeCard.parentNode.removeChild(activeCard);
   activeCard = undefined;
 
-  document.removeEventListener('keydown', EscapeKeyPressHandler);
+  document.removeEventListener('keydown', escapeKeyPressHandler);
+};
+
+/**
+ * Добавляет класс пину, карточка которого открыта, и сохраняет ссылку на него
+ * @param {Node} pin
+ */
+var setActivePin = function (pin) {
+  if (activePin) {
+    deleteActivePin();
+  }
+
+  activePin = pin;
+  activePin.classList.add('map__pin--active');
+};
+
+/**
+ * Убирает класс у активного пина и сбрасывает ссылку на него
+ */
+var deleteActivePin = function () {
+  activePin.classList.remove('map__pin--active');
+  activePin = undefined;
+};
+
+var escapeKeyPressHandler = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeActiveCard();
+  }
+};
+
+var mainPinClickHandler = function () {
+  activatePage();
+
+  mainPin.removeEventListener('mouseup', mainPinClickHandler);
 };
 
 var activatePage = function () {
@@ -459,15 +493,6 @@ var activatePage = function () {
   pinsContainer.appendChild(createPinsFragment(ads));
 };
 
-var mainPinClickHandler = function () {
-  activatePage();
-
-  mainPin.removeEventListener('mouseup', mainPinClickHandler);
-};
-
-/**
- * Инициализирует страницу
- */
 var initPage = function () {
   // Блокируем поля форм
   adFieldsets.forEach(function (item) {
