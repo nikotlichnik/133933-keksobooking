@@ -127,7 +127,7 @@ var pinParams = {
  * @property {number} WIDTH
  * @property {number} HEIGHT
  */
-var addressPointerParams = {
+var mainPinParams = {
   WIDTH: 65,
   HEIGHT: 87
 };
@@ -165,7 +165,7 @@ var offerTypesTranslation = {
 };
 
 var map = document.querySelector('.map');
-var addressPointer = map.querySelector('.map__pin--main');
+var mainPin = map.querySelector('.map__pin--main');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
 var adForm = document.querySelector('.ad-form');
@@ -401,8 +401,8 @@ var generateInfoCard = function (ad) {
  */
 var getCoordinates = function (pointer) {
   return {
-    x: pointer.offsetLeft + Math.floor(addressPointerParams.WIDTH / 2),
-    y: pointer.offsetTop + addressPointerParams.HEIGHT
+    x: pointer.offsetLeft + Math.floor(mainPinParams.WIDTH / 2),
+    y: pointer.offsetTop + mainPinParams.HEIGHT
   };
 };
 
@@ -462,7 +462,7 @@ var activatePage = function () {
 var mainPinClickHandler = function () {
   activatePage();
 
-  addressPointer.removeEventListener('mouseup', mainPinClickHandler);
+  mainPin.removeEventListener('mouseup', mainPinClickHandler);
 };
 
 /**
@@ -474,9 +474,9 @@ var initPage = function () {
     item.disabled = true;
   });
 
-  addressPointer.addEventListener('mouseup', mainPinClickHandler);
+  mainPin.addEventListener('mouseup', mainPinClickHandler);
 
-  setAddressValue(getCoordinates(addressPointer));
+  setAddressValue(getCoordinates(mainPin));
 };
 
 initPage();
