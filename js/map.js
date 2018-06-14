@@ -282,7 +282,10 @@ var createPinElement = function (ad) {
   var pinElement = pinTemplate.cloneNode(true);
   var pinImage = pinElement.querySelector('img');
 
-  pinElement.addEventListener('click', pinClickHandler);
+  pinElement.addEventListener('click', function () {
+    openCard(ad);
+  });
+
   pinElement.style.left = (ad.location.x - pinParams.WIDTH / 2) + 'px';
   pinElement.style.top = (ad.location.y - pinParams.HEIGHT) + 'px';
   pinImage.src = ad.author.avatar;
@@ -401,26 +404,11 @@ var setAddressValue = function (pointer) {
 };
 
 /**
- * Показывает карточку с информацией об объявлении
- * @param {Event} evt
+ * Открывает карточку с информацией об объявлении
+ * @param {Ad} ad
  */
-var pinClickHandler = function (evt) {
-  var target = evt.currentTarget;
-  var pinImage = target.querySelector('img');
-  var pinImagePath = pinImage.src;
-  var openedCard = map.querySelector('.map__card');
-
-  // Удаляем из DOM открытую карточку, если такая есть
-  if (openedCard) {
-    openedCard.parentNode.removeChild(openedCard);
-  }
-
-  // Получаем "Id" пользователя из адреса аватарки
-  var userId = parseInt(pinImagePath.match(/\d+\.png/g)[0], 10);
-
-  // Добавляем карточку с информацией
-  map.insertBefore(generateInfoCard(ads[userId - 1]), filtersContainer);
-
+var openCard = function (ad) {
+  map.insertBefore(generateInfoCard(ad), filtersContainer);
   document.addEventListener('keydown', EscapeKeyPressHandler);
 };
 
@@ -475,6 +463,15 @@ var initPage = function () {
   // Блокируем поля форм
   adFieldsets.forEach(function (item) {
     item.disabled = true;
+  });
+
+  // Следим за тем, чтобы на карте было не более одной открытой карточки с информацией
+  map.addEventListener('click', function () {
+    var openedCard = map.querySelectorAll('.map__card');
+
+    if (openedCard.length === 2) {
+      map.removeChild(openedCard[0]);
+    }
   });
 
   addressPointer.addEventListener('mouseup', addressPointerFirstClickHandler);
