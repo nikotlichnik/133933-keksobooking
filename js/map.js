@@ -439,8 +439,8 @@ var openCard = function (ad) {
  */
 var closeActiveCard = function () {
   activeCard.parentNode.removeChild(activeCard);
-  activeCard = undefined;
-  deleteActivePin();
+  activeCard = null;
+  deactivatePin();
 
   document.removeEventListener('keydown', escapeKeyPressHandler);
 };
@@ -461,9 +461,9 @@ var setActivePin = function (pin) {
 /**
  * Убирает класс у активного пина и сбрасывает ссылку на него
  */
-var deleteActivePin = function () {
+var deactivatePin = function () {
   activePin.classList.remove('map__pin--active');
-  activePin = undefined;
+  activePin = null;
 };
 
 var escapeKeyPressHandler = function (evt) {
