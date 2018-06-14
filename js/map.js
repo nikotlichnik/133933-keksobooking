@@ -7,7 +7,7 @@
 var NUM_OF_ADS = 8;
 
 /**
- * @type {number}
+ * @constant {number}
  */
 var ESC_KEYCODE = 27;
 
