@@ -130,8 +130,8 @@ var pinParams = {
  * @property {number} DEFAULT_Y
  */
 var addressPointerParams = {
-  WIDTH: 40,
-  HEIGHT: 44,
+  WIDTH: 65,
+  HEIGHT: 87,
   DEFAULT_X: 570,
   DEFAULT_Y: 375
 };
@@ -399,7 +399,7 @@ var generateInfoCard = function (ad) {
 var setAddressValue = function (pointer) {
   var pointerX = pointer.style.left ? parseInt(pointer.style.left, 10) : addressPointerParams.DEFAULT_X;
   var pointerY = pointer.style.top ? parseInt(pointer.style.top, 10) : addressPointerParams.DEFAULT_Y;
-  var x = pointerX + addressPointerParams.WIDTH / 2;
+  var x = pointerX + Math.floor(addressPointerParams.WIDTH / 2);
   var y = pointerY + addressPointerParams.HEIGHT;
 
   addressField.value = x + ', ' + y;
