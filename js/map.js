@@ -440,6 +440,7 @@ var openCard = function (ad) {
 var closeActiveCard = function () {
   activeCard.parentNode.removeChild(activeCard);
   activeCard = undefined;
+  deleteActivePin();
 
   document.removeEventListener('keydown', escapeKeyPressHandler);
 };
@@ -449,8 +450,8 @@ var closeActiveCard = function () {
  * @param {Node} pin
  */
 var setActivePin = function (pin) {
-  if (activePin) {
-    deleteActivePin();
+  if (activeCard) {
+    closeActiveCard();
   }
 
   activePin = pin;
