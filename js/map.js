@@ -126,14 +126,10 @@ var pinParams = {
  * @type {Object} AddressPointerParams
  * @property {number} WIDTH
  * @property {number} HEIGHT
- * @property {number} DEFAULT_X
- * @property {number} DEFAULT_Y
  */
 var addressPointerParams = {
   WIDTH: 65,
-  HEIGHT: 87,
-  DEFAULT_X: 570,
-  DEFAULT_Y: 375
+  HEIGHT: 87
 };
 
 /**
@@ -395,14 +391,20 @@ var generateInfoCard = function (ad) {
 
 /**
  * @param {HTMLElement} pointer
+ * @return {Location}
  */
-var setAddressValue = function (pointer) {
-  var pointerX = pointer.style.left ? parseInt(pointer.style.left, 10) : addressPointerParams.DEFAULT_X;
-  var pointerY = pointer.style.top ? parseInt(pointer.style.top, 10) : addressPointerParams.DEFAULT_Y;
-  var x = pointerX + Math.floor(addressPointerParams.WIDTH / 2);
-  var y = pointerY + addressPointerParams.HEIGHT;
+var getCoordinates = function (pointer) {
+  return {
+    x: pointer.offsetLeft + Math.floor(addressPointerParams.WIDTH / 2),
+    y: pointer.offsetTop + addressPointerParams.HEIGHT
+  };
+};
 
-  addressField.value = x + ', ' + y;
+/**
+ * @param {Location} coordinates
+ */
+var setAddressValue = function (coordinates) {
+  addressField.value = coordinates.x + ', ' + coordinates.y;
 };
 
 var EscapeKeyPressHandler = function (evt) {
@@ -468,7 +470,7 @@ var initPage = function () {
 
   addressPointer.addEventListener('mouseup', addressPointerFirstClickHandler);
 
-  setAddressValue(addressPointer);
+  setAddressValue(getCoordinates(addressPointer));
 };
 
 initPage();
