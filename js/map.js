@@ -112,7 +112,7 @@ var locationParams = {
 
 /**
  * Параметры маркера на карте
- * @typedef {Object} PinParams
+ * @type {Object}
  * @property {number} WIDTH
  * @property {number} HEIGHT
  */
@@ -122,8 +122,8 @@ var pinParams = {
 };
 
 /**
- * Параметры маркера выбора адреса на карте
- * @type {Object} AddressPointerParams
+ * Параметры главного маркера выбора адреса на карте
+ * @type {Object}
  * @property {number} WIDTH
  * @property {number} HEIGHT
  */
