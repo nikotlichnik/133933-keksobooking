@@ -291,8 +291,8 @@ var createPinElement = function (ad) {
   var pinImage = pinElement.querySelector('img');
 
   pinElement.addEventListener('click', function () {
-    setActivePin(pinElement);
     openCard(ad);
+    setActivePin(pinElement);
   });
 
   pinElement.style.left = (ad.location.x - pinParams.WIDTH / 2) + 'px';
@@ -440,6 +440,7 @@ var openCard = function (ad) {
 var closeActiveCard = function () {
   activeCard.parentNode.removeChild(activeCard);
   activeCard = null;
+
   deactivatePin();
 
   document.removeEventListener('keydown', escapeKeyPressHandler);
@@ -450,10 +451,6 @@ var closeActiveCard = function () {
  * @param {Node} pin
  */
 var setActivePin = function (pin) {
-  if (activeCard) {
-    closeActiveCard();
-  }
-
   activePin = pin;
   activePin.classList.add('map__pin--active');
 };
