@@ -188,21 +188,28 @@ var minPriceConstraints = {
 /**
  * Ограничение на связь количества гостей и комнат
  * @type {Object}
- * @enum {number} rooms - число гостей
- * @enum {number} messages - сообщения для разного кол-ва гостей
+ * @enum {Range} - Ограничение на число гостей
  */
 var capacityConstraint = {
-  rooms: {
-    '1': 1,
-    '2': 2,
-    '3': 3,
-    '100': 0
+  '1': {
+    MIN: 1,
+    MAX: 1
   },
-  messages: {
-    normal: 'Максимальное количество гостей для выбранного типа жилья – ',
-    noGuest: 'Ваше жильё не для гостей'
+  '2': {
+    MIN: 1,
+    MAX: 2
+  },
+  '3': {
+    MIN: 1,
+    MAX: 3
+  },
+  '100': {
+    MIN: 0,
+    MAX: 0
   }
 };
+
+var NO_GUEST_MESSAGE = 'Ваше жильё должно быть не для гостей';
 
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
@@ -229,6 +236,16 @@ var cardTemplate = template.content.querySelector('.map__card');
  */
 var getRandomIndexOfArray = function (array) {
   return Math.floor(Math.random() * array.length);
+};
+
+/**
+ * Проверяет, находится ли число в диапазоне
+ * @param {number} number - число
+ * @param {Range} range
+ * @return {Boolean}
+ */
+var isInRange = function (number, range) {
+  return (number >= range.MIN) && (number <= range.MAX);
 };
 
 /**
@@ -565,18 +582,22 @@ var checkPriceConstraint = function () {
 var checkCapacityConstraint = function () {
   var numOfRooms = roomNumberInput.value;
   var capacity = capacityInput.value;
-  var maxCapacity = capacityConstraint.rooms[numOfRooms];
+  var capacityRange = capacityConstraint[numOfRooms];
 
-  var message = maxCapacity ? capacityConstraint.messages.normal + maxCapacity : capacityConstraint.messages.noGuest;
+  var minGuest = capacityRange.MIN;
+  var maxGuest = capacityRange.MAX;
+  var normalMessage = 'Для выбранного количества комнат минимум гостей - ' + minGuest + ', максимум - ' + maxGuest;
 
-  if (capacity > maxCapacity) {
+  var message = (capacityRange.MAX === 0) ? NO_GUEST_MESSAGE : normalMessage;
+
+  if (!isInRange(capacity, capacityRange)) {
     capacityInput.setCustomValidity(message);
   } else {
     capacityInput.setCustomValidity('');
   }
 };
 
-var resetPage = function () {
+var resetMap = function () {
   // Закрываем открытую карточку
   if (activeCard) {
     closeActiveCard();
@@ -591,19 +612,23 @@ var resetPage = function () {
   // Ставим приветственное сообщение
   map.classList.add('map--faded');
 
-  // Сбрасываем форму
-  adForm.reset();
-  refreshPricePlaceholder();
+  // Восстанавливаем состояние главного маркера
+  mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
+  mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+};
 
-  // Дективируем элементы формы заполнения информации об объявлении
+var resetForm = function () {
+  adForm.reset();
+
   adForm.classList.add('ad-form--disabled');
   adFieldsets.forEach(function (item) {
     item.disabled = true;
   });
 
-  // Восстанавливаем состояние главного маркера
-  mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
-  mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+  refreshPricePlaceholder();
+  priceInput.setCustomValidity('');
+  capacityInput.setCustomValidity('');
+
   setAddressValue(getCoordinates(mainPin));
 
   // Удаляем обработчики ограничений форм
@@ -615,23 +640,21 @@ var resetPage = function () {
   roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
 
   resetButton.removeEventListener('click', resetClickHandler);
+};
+
+var resetPage = function () {
+  resetMap();
+  resetForm();
 
   mainPin.addEventListener('mouseup', mainPinClickHandler);
 };
 
-var activatePage = function () {
-  var ads = generateSimilarAds();
-
-  // Убираем приветственное сообщение
-  map.classList.remove('map--faded');
-
-  // Активируем элементы формы заполнения информации об объявлении
+var activateForm = function () {
   adForm.classList.remove('ad-form--disabled');
   adFieldsets.forEach(function (item) {
     item.disabled = false;
   });
 
-  // Вешаем обработчики ограничений на форму
   priceInput.addEventListener('input', priceInputHandler);
   typeInput.addEventListener('change', typeChangeHandler);
   checkinInput.addEventListener('change', checkinChangeHandler);
@@ -640,9 +663,19 @@ var activatePage = function () {
   roomNumberInput.addEventListener('change', roomNumberChangeHandler);
 
   resetButton.addEventListener('click', resetClickHandler);
+};
 
-  // Добавляем маркеры в контейнер
+var activateMap = function () {
+  var ads = generateSimilarAds();
+
+  map.classList.remove('map--faded');
+
   pinsContainer.appendChild(createPinsFragment(ads));
+};
+
+var activatePage = function () {
+  activateMap();
+  activateForm();
 };
 
 var initPage = function () {
