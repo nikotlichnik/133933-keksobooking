@@ -126,10 +126,14 @@ var pinParams = {
  * @type {Object}
  * @property {number} WIDTH
  * @property {number} HEIGHT
+ * @property {number} DEFAULT_OFFSET_LEFT
+ * @property {number} DEFAULT_OFFSET_TOP
  */
 var mainPinParams = {
   WIDTH: 65,
-  HEIGHT: 87
+  HEIGHT: 87,
+  DEFAULT_OFFSET_LEFT: 570,
+  DEFAULT_OFFSET_TOP: 375
 };
 
 /**
@@ -170,12 +174,49 @@ var offerTypesTranslation = {
   bungalo: 'Бунгало'
 };
 
+/**
+ * Минимальные цены разных типов жилья
+ * @enum {number}
+ */
+var minPriceConstraints = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+
+/**
+ * Ограничение на связь количества гостей и комнат
+ * @type {Object}
+ * @enum {number} rooms - число гостей
+ * @enum {number} messages - сообщения для разного кол-ва гостей
+ */
+var capacityConstraint = {
+  rooms: {
+    '1': 1,
+    '2': 2,
+    '3': 3,
+    '100': 0
+  },
+  messages: {
+    normal: 'Максимальное количество гостей для выбранного типа жилья – ',
+    noGuest: 'Ваше жильё не для гостей'
+  }
+};
+
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
 var adForm = document.querySelector('.ad-form');
 var addressField = adForm.querySelector('#address');
+var typeInput = adForm.querySelector('#type');
+var priceInput = adForm.querySelector('#price');
+var checkinInput = adForm.querySelector('#timein');
+var checkoutInput = adForm.querySelector('#timeout');
+var roomNumberInput = adForm.querySelector('#room_number');
+var capacityInput = adForm.querySelector('#capacity');
+var resetButton = adForm.querySelector('.ad-form__reset');
 var adFieldsets = adForm.querySelectorAll('.ad-form__element');
 
 var template = document.querySelector('template');
@@ -475,6 +516,109 @@ var mainPinClickHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinClickHandler);
 };
 
+var resetClickHandler = function () {
+  resetPage();
+};
+
+var roomNumberChangeHandler = function () {
+  checkCapacityConstraint();
+};
+
+var capacityChangeHandler = function () {
+  checkCapacityConstraint();
+};
+
+var checkoutChangeHandler = function () {
+  checkinInput.value = checkoutInput.value;
+};
+
+var checkinChangeHandler = function () {
+  checkoutInput.value = checkinInput.value;
+};
+
+var typeChangeHandler = function () {
+  refreshPricePlaceholder();
+  checkPriceConstraint();
+};
+
+var priceInputHandler = function () {
+  checkPriceConstraint();
+};
+
+var refreshPricePlaceholder = function () {
+  var type = typeInput.value;
+  priceInput.placeholder = minPriceConstraints[type];
+};
+
+var checkPriceConstraint = function () {
+  var type = typeInput.value;
+  var price = priceInput.value;
+  var minPrice = minPriceConstraints[type];
+
+  if (price < minPrice) {
+    priceInput.setCustomValidity('Минимальная цена для типа "' + offerTypesTranslation[type] + '" ' + minPrice + '₽');
+  } else {
+    priceInput.setCustomValidity('');
+  }
+};
+
+var checkCapacityConstraint = function () {
+  var numOfRooms = roomNumberInput.value;
+  var capacity = capacityInput.value;
+  var maxCapacity = capacityConstraint.rooms[numOfRooms];
+
+  var message = maxCapacity ? capacityConstraint.messages.normal + maxCapacity : capacityConstraint.messages.noGuest;
+
+  if (capacity > maxCapacity) {
+    capacityInput.setCustomValidity(message);
+  } else {
+    capacityInput.setCustomValidity('');
+  }
+};
+
+var resetPage = function () {
+  // Закрываем открытую карточку
+  if (activeCard) {
+    closeActiveCard();
+  }
+
+  // Удаляем все указатели с карты, кроме главного
+  var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+  pins.forEach(function (item) {
+    item.parentNode.removeChild(item);
+  });
+
+  // Ставим приветственное сообщение
+  map.classList.add('map--faded');
+
+  // Сбрасываем форму
+  adForm.reset();
+  refreshPricePlaceholder();
+
+  // Дективируем элементы формы заполнения информации об объявлении
+  adForm.classList.add('ad-form--disabled');
+  adFieldsets.forEach(function (item) {
+    item.disabled = true;
+  });
+
+  // Восстанавливаем состояние главного маркера
+  mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
+  mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+  setAddressValue(getCoordinates(mainPin));
+
+  // Удаляем обработчики ограничений форм
+  priceInput.removeEventListener('input', priceInputHandler);
+  typeInput.removeEventListener('change', typeChangeHandler);
+  checkinInput.removeEventListener('change', checkinChangeHandler);
+  checkoutInput.removeEventListener('change', checkoutChangeHandler);
+  capacityInput.removeEventListener('change', capacityChangeHandler);
+  roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
+
+  resetButton.removeEventListener('click', resetClickHandler);
+
+  mainPin.addEventListener('mouseup', mainPinClickHandler);
+};
+
 var activatePage = function () {
   var ads = generateSimilarAds();
 
@@ -486,6 +630,16 @@ var activatePage = function () {
   adFieldsets.forEach(function (item) {
     item.disabled = false;
   });
+
+  // Вешаем обработчики ограничений на форму
+  priceInput.addEventListener('input', priceInputHandler);
+  typeInput.addEventListener('change', typeChangeHandler);
+  checkinInput.addEventListener('change', checkinChangeHandler);
+  checkoutInput.addEventListener('change', checkoutChangeHandler);
+  capacityInput.addEventListener('change', capacityChangeHandler);
+  roomNumberInput.addEventListener('change', roomNumberChangeHandler);
+
+  resetButton.addEventListener('click', resetClickHandler);
 
   // Добавляем маркеры в контейнер
   pinsContainer.appendChild(createPinsFragment(ads));
