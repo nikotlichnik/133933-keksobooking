@@ -541,20 +541,14 @@ var resetClickHandler = function () {
   resetPage();
 };
 
-var roomNumberChangeHandler = function () {
-  checkCapacityConstraint();
-};
-
 var capacityChangeHandler = function () {
   checkCapacityConstraint();
 };
 
-var checkoutChangeHandler = function () {
-  checkinInput.value = checkoutInput.value;
-};
-
-var checkinChangeHandler = function () {
-  checkoutInput.value = checkinInput.value;
+var timeChangeHandler = function (evt) {
+  var time = evt.target.value;
+  checkinInput.value = time;
+  checkoutInput.value = time;
 };
 
 var typeChangeHandler = function () {
@@ -668,10 +662,10 @@ var resetForm = function () {
   priceInput.removeEventListener('input', priceInputHandler);
   typeInput.removeEventListener('change', typeChangeHandler);
   titleInput.removeEventListener('input', titleInputHandler);
-  checkinInput.removeEventListener('change', checkinChangeHandler);
-  checkoutInput.removeEventListener('change', checkoutChangeHandler);
+  checkinInput.removeEventListener('change', timeChangeHandler);
+  checkoutInput.removeEventListener('change', timeChangeHandler);
   capacityInput.removeEventListener('change', capacityChangeHandler);
-  roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
+  roomNumberInput.removeEventListener('change', capacityChangeHandler);
 
 
   submitButton.removeEventListener('click', submitClickHandler);
@@ -696,10 +690,10 @@ var activateForm = function () {
   titleInput.addEventListener('input', titleInputHandler);
   priceInput.addEventListener('input', priceInputHandler);
   typeInput.addEventListener('change', typeChangeHandler);
-  checkinInput.addEventListener('change', checkinChangeHandler);
-  checkoutInput.addEventListener('change', checkoutChangeHandler);
+  checkinInput.addEventListener('change', timeChangeHandler);
+  checkoutInput.addEventListener('change', timeChangeHandler);
   capacityInput.addEventListener('change', capacityChangeHandler);
-  roomNumberInput.addEventListener('change', roomNumberChangeHandler);
+  roomNumberInput.addEventListener('change', capacityChangeHandler);
 
   resetButton.addEventListener('click', resetClickHandler);
 };
