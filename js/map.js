@@ -610,7 +610,7 @@ var checkCapacityConstraint = function () {
   capacityInput.value = capacityInput.value ? capacityInput.value : capacityVariants[0];
 };
 
-var resetMap = function () {
+var resetMapToInitialState = function () {
   // Закрываем открытую карточку
   if (activeCard) {
     closeActiveCard();
@@ -630,36 +630,38 @@ var resetMap = function () {
   mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
 };
 
-var resetForm = function () {
-  adForm.reset();
-
+var disableForm = function () {
   adForm.classList.add('ad-form--disabled');
   adFieldsets.forEach(function (item) {
     item.disabled = true;
   });
+};
 
-  refreshPriceAttributes();
-  priceInput.setCustomValidity('');
-  capacityInput.setCustomValidity('');
-
-  setAddressValue(getCoordinates(mainPin));
-
-  // Удаляем обработчики ограничений форм
-  priceInput.removeEventListener('input', priceInputHandler);
-  typeInput.removeEventListener('change', typeChangeHandler);
+var removeFormHandlers = function () {
   titleInput.removeEventListener('input', titleInputHandler);
+  typeInput.removeEventListener('change', typeChangeHandler);
+  priceInput.removeEventListener('input', priceInputHandler);
   checkinInput.removeEventListener('change', timeChangeHandler);
   checkoutInput.removeEventListener('change', timeChangeHandler);
   roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
-
 
   submitButton.removeEventListener('click', submitClickHandler);
   resetButton.removeEventListener('click', resetClickHandler);
 };
 
+var resetFormToInitialState = function () {
+  adForm.reset();
+  disableForm();
+
+  refreshPriceAttributes();
+  setAddressValue(getCoordinates(mainPin));
+
+  removeFormHandlers();
+};
+
 var resetPage = function () {
-  resetMap();
-  resetForm();
+  resetMapToInitialState();
+  resetFormToInitialState();
 
   mainPin.addEventListener('mouseup', mainPinClickHandler);
 };
