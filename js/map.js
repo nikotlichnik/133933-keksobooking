@@ -188,28 +188,14 @@ var minPriceConstraints = {
 /**
  * Ограничение на связь количества гостей и комнат
  * @type {Object}
- * @enum {Range} - Ограничение на число гостей
+ * @enum {Array.<numbers>} - Возможные варианты числа гостей
  */
 var capacityConstraint = {
-  '1': {
-    MIN: 1,
-    MAX: 1
-  },
-  '2': {
-    MIN: 1,
-    MAX: 2
-  },
-  '3': {
-    MIN: 1,
-    MAX: 3
-  },
-  '100': {
-    MIN: 0,
-    MAX: 0
-  }
+  '1': [1],
+  '2': [1, 2],
+  '3': [1, 2, 3],
+  '100': [0]
 };
-
-var NO_GUEST_MESSAGE = 'Ваше жильё должно быть не для гостей';
 
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
@@ -541,7 +527,7 @@ var resetClickHandler = function () {
   resetPage();
 };
 
-var capacityChangeHandler = function () {
+var roomNumberChangeHandler = function () {
   checkCapacityConstraint();
 };
 
@@ -571,7 +557,7 @@ var titleInputHandler = function () {
 var highlightInvalidInputs = function () {
   inputElements.forEach(function (input) {
     // Если поле невалидно - ставим красную рамку
-    if (!input.checkValidity()) {
+    if (!input.validity.valid) {
       addRedOutline(input);
     }
   });
@@ -601,21 +587,28 @@ var checkPriceConstraint = function () {
 
 var checkCapacityConstraint = function () {
   var numOfRooms = roomNumberInput.value;
-  var capacity = capacityInput.value;
-  var capacityRange = capacityConstraint[numOfRooms];
 
-  var minGuest = capacityRange.MIN;
-  var maxGuest = capacityRange.MAX;
-  var normalMessage = 'Для выбранного количества комнат минимум гостей - ' + minGuest + ', максимум - ' + maxGuest;
+  var capacityVariants = capacityConstraint[numOfRooms];
 
-  var message = (capacityRange.MAX === 0) ? NO_GUEST_MESSAGE : normalMessage;
+  for (var i = 0; i < capacityInput.options.length; i++) {
+    // Получаем значение текущего варианта
+    var optionValue = parseInt(capacityInput.options[i].value, 10);
+    // Проверяем отсутствие текущего варианта в доступных
+    var isAbsent = capacityVariants.indexOf(optionValue) === -1;
+    // Блокируем вариант, если отсутствует
+    capacityInput.options[i].disabled = isAbsent;
 
-  if (!isInRange(capacity, capacityRange)) {
-    capacityInput.setCustomValidity(message);
-  } else {
-    capacityInput.setCustomValidity('');
-    removeOutlineIfValid(capacityInput);
+    // Проверяем, выбран ли текущий вариант
+    var isSelected = capacityInput.options[i].selected;
+
+    // Если текущий заблокирован и выбран, то снимаем выделение
+    if (isSelected && isAbsent) {
+      capacityInput.options[i].selected = false;
+    }
   }
+
+  // Если поле осталось без выбранного значения, то устанавливаем первый доступный вариант
+  capacityInput.value = capacityInput.value ? capacityInput.value : capacityVariants[0];
 };
 
 var resetMap = function () {
@@ -658,8 +651,7 @@ var resetForm = function () {
   titleInput.removeEventListener('input', titleInputHandler);
   checkinInput.removeEventListener('change', timeChangeHandler);
   checkoutInput.removeEventListener('change', timeChangeHandler);
-  capacityInput.removeEventListener('change', capacityChangeHandler);
-  roomNumberInput.removeEventListener('change', capacityChangeHandler);
+  roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
 
 
   submitButton.removeEventListener('click', submitClickHandler);
@@ -686,8 +678,7 @@ var activateForm = function () {
   typeInput.addEventListener('change', typeChangeHandler);
   checkinInput.addEventListener('change', timeChangeHandler);
   checkoutInput.addEventListener('change', timeChangeHandler);
-  capacityInput.addEventListener('change', capacityChangeHandler);
-  roomNumberInput.addEventListener('change', capacityChangeHandler);
+  roomNumberInput.addEventListener('change', roomNumberChangeHandler);
 
   resetButton.addEventListener('click', resetClickHandler);
 };
