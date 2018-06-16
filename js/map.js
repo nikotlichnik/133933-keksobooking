@@ -131,7 +131,7 @@ var pinParams = {
  */
 var mainPinParams = {
   WIDTH: 65,
-  HEIGHT: 87,
+  HEIGHT: 79,
   DEFAULT_OFFSET_LEFT: 570,
   DEFAULT_OFFSET_TOP: 375
 };
