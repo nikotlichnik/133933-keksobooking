@@ -215,14 +215,18 @@ var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
+
 var adForm = document.querySelector('.ad-form');
+var inputElements = adForm.querySelectorAll('input, select, textarea');
 var addressField = adForm.querySelector('#address');
+var titleInput = adForm.querySelector('#title');
 var typeInput = adForm.querySelector('#type');
 var priceInput = adForm.querySelector('#price');
 var checkinInput = adForm.querySelector('#timein');
 var checkoutInput = adForm.querySelector('#timeout');
 var roomNumberInput = adForm.querySelector('#room_number');
 var capacityInput = adForm.querySelector('#capacity');
+var submitButton = adForm.querySelector('.ad-form__submit');
 var resetButton = adForm.querySelector('.ad-form__reset');
 var adFieldsets = adForm.querySelectorAll('.ad-form__element');
 
@@ -562,6 +566,33 @@ var priceInputHandler = function () {
   checkPriceConstraint();
 };
 
+var submitClickHandler = function () {
+  highlightInvalidInputs();
+};
+
+var titleInputHandler = function () {
+  if (titleInput.checkValidity()) {
+    removeOutline(titleInput);
+  }
+};
+
+var highlightInvalidInputs = function () {
+  inputElements.forEach(function (input) {
+    // Если поле невалидно - ставим красную рамку
+    if (!input.checkValidity()) {
+      addRedOutline(input);
+    }
+  });
+};
+
+var addRedOutline = function (element) {
+  element.style.outline = '2px solid red';
+};
+
+var removeOutline = function (element) {
+  element.style.outline = '';
+};
+
 var refreshPricePlaceholder = function () {
   var type = typeInput.value;
   priceInput.placeholder = minPriceConstraints[type];
@@ -576,6 +607,7 @@ var checkPriceConstraint = function () {
     priceInput.setCustomValidity('Минимальная цена для типа "' + offerTypesTranslation[type] + '" ' + minPrice + '₽');
   } else {
     priceInput.setCustomValidity('');
+    removeOutline(priceInput);
   }
 };
 
@@ -594,6 +626,7 @@ var checkCapacityConstraint = function () {
     capacityInput.setCustomValidity(message);
   } else {
     capacityInput.setCustomValidity('');
+    removeOutline(capacityInput);
   }
 };
 
@@ -634,11 +667,14 @@ var resetForm = function () {
   // Удаляем обработчики ограничений форм
   priceInput.removeEventListener('input', priceInputHandler);
   typeInput.removeEventListener('change', typeChangeHandler);
+  titleInput.removeEventListener('input', titleInputHandler);
   checkinInput.removeEventListener('change', checkinChangeHandler);
   checkoutInput.removeEventListener('change', checkoutChangeHandler);
   capacityInput.removeEventListener('change', capacityChangeHandler);
   roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
 
+
+  submitButton.removeEventListener('click', submitClickHandler);
   resetButton.removeEventListener('click', resetClickHandler);
 };
 
@@ -655,6 +691,9 @@ var activateForm = function () {
     item.disabled = false;
   });
 
+  submitButton.addEventListener('click', submitClickHandler);
+
+  titleInput.addEventListener('input', titleInputHandler);
   priceInput.addEventListener('input', priceInputHandler);
   typeInput.addEventListener('change', typeChangeHandler);
   checkinInput.addEventListener('change', checkinChangeHandler);
