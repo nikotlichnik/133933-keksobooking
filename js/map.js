@@ -229,16 +229,6 @@ var getRandomIndexOfArray = function (array) {
 };
 
 /**
- * Проверяет, находится ли число в диапазоне
- * @param {number} number - число
- * @param {Range} range
- * @return {Boolean}
- */
-var isInRange = function (number, range) {
-  return (number >= range.MIN) && (number <= range.MAX);
-};
-
-/**
  * @param {number} startNumber - Нижняя граница диапазона
  * @param {number} finishNumber - Верхняя граница диапазона
  * @return {number} - Случайное число в заданном диапазоне, включая концы интервала
