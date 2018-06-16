@@ -149,6 +149,12 @@ var activeCard;
 var activePin;
 
 /**
+ * Содержит пины, открытые на карте
+ * @type {Array.<Node>}
+ */
+var pinsOnMap = [];
+
+/**
  * Параметры фотографии жилья
  * @typedef {Object} PhotoParams
  * @property {number} WIDTH
@@ -349,7 +355,10 @@ var createPinsFragment = function (ads) {
   var fragment = document.createDocumentFragment();
 
   ads.forEach(function (item) {
-    fragment.appendChild(createPinElement(item));
+    var pin = createPinElement(item);
+
+    pinsOnMap.push(pin);
+    fragment.appendChild(pin);
   });
 
   return fragment;
@@ -608,10 +617,10 @@ var resetMap = function () {
   }
 
   // Удаляем все указатели с карты, кроме главного
-  var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-  pins.forEach(function (item) {
+  pinsOnMap.forEach(function (item) {
     item.parentNode.removeChild(item);
   });
+  pinsOnMap = [];
 
   // Ставим приветственное сообщение
   map.classList.add('map--faded');
