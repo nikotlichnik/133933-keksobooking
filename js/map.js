@@ -552,7 +552,7 @@ var timeChangeHandler = function (evt) {
 };
 
 var typeChangeHandler = function () {
-  refreshPricePlaceholder();
+  refreshPriceAttributes();
   checkPriceConstraint();
 };
 
@@ -565,9 +565,7 @@ var submitClickHandler = function () {
 };
 
 var titleInputHandler = function () {
-  if (titleInput.checkValidity()) {
-    removeOutline(titleInput);
-  }
+  removeOutlineIfValid(titleInput);
 };
 
 var highlightInvalidInputs = function () {
@@ -583,26 +581,22 @@ var addRedOutline = function (element) {
   element.style.outline = '2px solid red';
 };
 
-var removeOutline = function (element) {
-  element.style.outline = '';
+var removeOutlineIfValid = function (element) {
+  if (element.validity.valid) {
+    element.style.outline = '';
+  }
 };
 
-var refreshPricePlaceholder = function () {
+var refreshPriceAttributes = function () {
   var type = typeInput.value;
-  priceInput.placeholder = minPriceConstraints[type];
+  var minPrice = minPriceConstraints[type];
+
+  priceInput.placeholder = minPrice;
+  priceInput.min = minPrice;
 };
 
 var checkPriceConstraint = function () {
-  var type = typeInput.value;
-  var price = priceInput.value;
-  var minPrice = minPriceConstraints[type];
-
-  if (price < minPrice) {
-    priceInput.setCustomValidity('Минимальная цена для типа "' + offerTypesTranslation[type] + '" ' + minPrice + '₽');
-  } else {
-    priceInput.setCustomValidity('');
-    removeOutline(priceInput);
-  }
+  removeOutlineIfValid(priceInput);
 };
 
 var checkCapacityConstraint = function () {
@@ -620,7 +614,7 @@ var checkCapacityConstraint = function () {
     capacityInput.setCustomValidity(message);
   } else {
     capacityInput.setCustomValidity('');
-    removeOutline(capacityInput);
+    removeOutlineIfValid(capacityInput);
   }
 };
 
@@ -652,7 +646,7 @@ var resetForm = function () {
     item.disabled = true;
   });
 
-  refreshPricePlaceholder();
+  refreshPriceAttributes();
   priceInput.setCustomValidity('');
   capacityInput.setCustomValidity('');
 
