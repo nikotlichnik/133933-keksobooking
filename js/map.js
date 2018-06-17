@@ -137,6 +137,21 @@ var mainPinParams = {
 };
 
 /**
+ * Границы изменения координаты маркера
+ * @type {Object}
+ * @property {number} TOP
+ * @property {number} BOTTOM
+ * @property {number} LEFT
+ * @property {number} RIGHT
+ */
+var mapBorders = {
+  TOP: 130,
+  BOTTOM: 630,
+  LEFT: 0,
+  RIGHT: 1200
+};
+
+/**
  * Содержит ссылку на открытую карточку с информацией
  * @type {Node}
  */
@@ -452,10 +467,23 @@ var generateInfoCard = function (ad) {
  * @param {HTMLElement} pointer
  * @return {Location}
  */
-var getCoordinates = function (pointer) {
+var getAddress = function (pointer) {
   return {
     x: pointer.offsetLeft + Math.floor(mainPinParams.WIDTH / 2),
     y: pointer.offsetTop + mainPinParams.HEIGHT
+  };
+};
+
+/**
+ * @param {HTMLElement} pointer
+ * @param {number} dx
+ * @param {number} dy
+ * @return {Location}
+ */
+var getNewAddress = function (pointer, dx, dy) {
+  return {
+    x: pointer.offsetLeft + dx + Math.floor(mainPinParams.WIDTH / 2),
+    y: pointer.offsetTop + dy + mainPinParams.HEIGHT
   };
 };
 
@@ -515,10 +543,10 @@ var escapeKeyPressHandler = function (evt) {
   }
 };
 
-var mainPinClickHandler = function () {
+var mainPinInitialClickHandler = function () {
   activatePage();
 
-  mainPin.removeEventListener('mouseup', mainPinClickHandler);
+  mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
 };
 
 var resetClickHandler = function () {
@@ -617,6 +645,7 @@ var resetMapToInitialState = function () {
   // Восстанавливаем состояние главного маркера
   mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
   mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+  mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
 };
 
 var disableForm = function () {
@@ -646,7 +675,7 @@ var resetFormToInitialState = function () {
   });
 
   refreshPriceAttributes();
-  setAddressValue(getCoordinates(mainPin));
+  setAddressValue(getAddress(mainPin));
 
   removeFormHandlers();
 };
@@ -654,8 +683,6 @@ var resetFormToInitialState = function () {
 var resetPage = function () {
   resetMapToInitialState();
   resetFormToInitialState();
-
-  mainPin.addEventListener('mouseup', mainPinClickHandler);
 };
 
 var activateForm = function () {
@@ -697,9 +724,53 @@ var initPage = function () {
     item.disabled = true;
   });
 
-  mainPin.addEventListener('mouseup', mainPinClickHandler);
+  // Добавляем обработчики событий на главный маркер
+  mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
+  mainPin.addEventListener('mousedown', function (evt) {
 
-  setAddressValue(getCoordinates(mainPin));
+    var cursorCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var mapMouseMoveHandler = function (moveEvt) {
+      // Получаем данные о смещении координат
+      var shift = {
+        x: moveEvt.clientX - cursorCoords.x,
+        y: moveEvt.clientY - cursorCoords.y
+      };
+
+      // Обновляем данные о положении курсора
+      cursorCoords.x = moveEvt.clientX;
+      cursorCoords.y = moveEvt.clientY;
+
+      // Получаем данные о том, куда будет указывать маркер после перемещения
+      var newCoords = getNewAddress(mainPin, shift.x, shift.y);
+
+      // Перемещаем, если новый адрес попадает в заданные рамки
+      if (newCoords.y <= mapBorders.BOTTOM && newCoords.y >= mapBorders.TOP) {
+        mainPin.style.top = (mainPin.offsetTop + shift.y) + 'px';
+      }
+      if (newCoords.x <= mapBorders.RIGHT && newCoords.x >= mapBorders.LEFT) {
+        mainPin.style.left = (mainPin.offsetLeft + shift.x) + 'px';
+      }
+
+      // Обновляем поле с адресом
+      setAddressValue(getAddress(mainPin));
+    };
+
+    var documentMouseUpHandler = function () {
+      setAddressValue(getAddress(mainPin));
+
+      document.removeEventListener('mousemove', mapMouseMoveHandler);
+      document.removeEventListener('mouseup', documentMouseUpHandler);
+    };
+
+    document.addEventListener('mousemove', mapMouseMoveHandler);
+    document.addEventListener('mouseup', documentMouseUpHandler);
+  });
+
+  setAddressValue(getAddress(mainPin));
 };
 
 initPage();
