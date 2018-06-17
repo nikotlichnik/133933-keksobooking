@@ -152,17 +152,6 @@ var mapBorders = {
 };
 
 /**
- * Координаты курсора при драг'н'дропе
- * @type {Object}
- * @property {number} x
- * @property {number} y
- */
-var cursorCoords = {
-  x: 0,
-  y: 0
-};
-
-/**
  * Содержит ссылку на открытую карточку с информацией
  * @type {Node}
  */
@@ -716,39 +705,6 @@ var activateForm = function () {
   resetButton.addEventListener('click', resetClickHandler);
 };
 
-var mapMouseMoveHandler = function (evt) {
-  // Получаем данные о смещении координат
-  var shift = {
-    x: evt.clientX - cursorCoords.x,
-    y: evt.clientY - cursorCoords.y
-  };
-
-  // Обновляем данные о положении маркера
-  cursorCoords.x = evt.clientX;
-  cursorCoords.y = evt.clientY;
-
-  // Получаем данные о том, куда будет указывать маркер после перемещения
-  var newCoords = getNewAddress(mainPin, shift.x, shift.y);
-
-  // Перемещаем, если новый адрес попадает в заданные рамки
-  if (newCoords.y <= mapBorders.BOTTOM && newCoords.y >= mapBorders.TOP) {
-    mainPin.style.top = (mainPin.offsetTop + shift.y) + 'px';
-  }
-  if (newCoords.x <= mapBorders.RIGHT && newCoords.x >= mapBorders.LEFT) {
-    mainPin.style.left = (mainPin.offsetLeft + shift.x) + 'px';
-  }
-
-  // Обновляем поле с адресом
-  setAddressValue(getAddress(mainPin));
-};
-
-var documentMouseUpHandler = function () {
-  setAddressValue(getAddress(mainPin));
-
-  document.removeEventListener('mousemove', mapMouseMoveHandler);
-  document.removeEventListener('mouseup', documentMouseUpHandler);
-};
-
 var activateMap = function () {
   var ads = generateSimilarAds();
 
@@ -771,8 +727,44 @@ var initPage = function () {
   // Добавляем обработчики событий на главный маркер
   mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
   mainPin.addEventListener('mousedown', function (evt) {
-    cursorCoords.x = evt.clientX;
-    cursorCoords.y = evt.clientY;
+
+    var cursorCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var mapMouseMoveHandler = function (evt) {
+      // Получаем данные о смещении координат
+      var shift = {
+        x: evt.clientX - cursorCoords.x,
+        y: evt.clientY - cursorCoords.y
+      };
+
+      // Обновляем данные о положении курсора
+      cursorCoords.x = evt.clientX;
+      cursorCoords.y = evt.clientY;
+
+      // Получаем данные о том, куда будет указывать маркер после перемещения
+      var newCoords = getNewAddress(mainPin, shift.x, shift.y);
+
+      // Перемещаем, если новый адрес попадает в заданные рамки
+      if (newCoords.y <= mapBorders.BOTTOM && newCoords.y >= mapBorders.TOP) {
+        mainPin.style.top = (mainPin.offsetTop + shift.y) + 'px';
+      }
+      if (newCoords.x <= mapBorders.RIGHT && newCoords.x >= mapBorders.LEFT) {
+        mainPin.style.left = (mainPin.offsetLeft + shift.x) + 'px';
+      }
+
+      // Обновляем поле с адресом
+      setAddressValue(getAddress(mainPin));
+    };
+
+    var documentMouseUpHandler = function () {
+      setAddressValue(getAddress(mainPin));
+
+      document.removeEventListener('mousemove', mapMouseMoveHandler);
+      document.removeEventListener('mouseup', documentMouseUpHandler);
+    };
 
     document.addEventListener('mousemove', mapMouseMoveHandler);
     document.addEventListener('mouseup', documentMouseUpHandler);
