@@ -184,7 +184,7 @@ var offerTypesTranslation = {
  * Минимальные цены разных типов жилья
  * @enum {number}
  */
-var minPriceConstraints = {
+var MinPriceConstraints = {
   bungalo: 0,
   flat: 1000,
   house: 5000,
@@ -193,10 +193,9 @@ var minPriceConstraints = {
 
 /**
  * Ограничение на связь количества гостей и комнат
- * @type {Object}
  * @enum {Array.<string>} - Возможные варианты числа гостей
  */
-var capacityConstraint = {
+var CapacityConstraint = {
   '1': ['1'],
   '2': ['1', '2'],
   '3': ['1', '2', '3'],
@@ -530,11 +529,23 @@ var roomNumberChangeHandler = function () {
   checkCapacityConstraint();
 };
 
-var timeChangeHandler = function (evt) {
-  var time = evt.target.value;
-  checkinInput.value = time;
-  checkoutInput.value = time;
+var setValue = function (field, value) {
+  field.value = value;
 };
+
+var checkinChangeHandler = function (evt) {
+  setValue(checkoutInput, evt.target.value);
+};
+
+var checkoutChangeHandler = function (evt) {
+  setValue(checkinInput, evt.target.value);
+};
+
+// var timeChangeHandler = function (evt) {
+//   var time = evt.target.value;
+//   checkinInput.value = time;
+//   checkoutInput.value = time;
+// };
 
 var typeChangeHandler = function () {
   refreshPriceAttributes();
@@ -560,7 +571,7 @@ var formFieldInputHandler = function (evt) {
 
 var refreshPriceAttributes = function () {
   var type = typeInput.value;
-  var minPrice = minPriceConstraints[type];
+  var minPrice = MinPriceConstraints[type];
 
   priceInput.placeholder = minPrice;
   priceInput.min = minPrice;
@@ -568,7 +579,7 @@ var refreshPriceAttributes = function () {
 
 var checkCapacityConstraint = function () {
   var numOfRooms = roomNumberInput.value;
-  var capacityVariants = capacityConstraint[numOfRooms];
+  var capacityVariants = CapacityConstraint[numOfRooms];
   var isPossibleValue = capacityVariants.indexOf(capacityInput.value) !== -1;
 
   // Если текущий выбранный вариант недоступен, то устанавливаем первый доступный
@@ -613,8 +624,8 @@ var removeFormHandlers = function () {
   titleInput.removeEventListener('input', formFieldInputHandler);
   typeInput.removeEventListener('change', typeChangeHandler);
   priceInput.removeEventListener('input', formFieldInputHandler);
-  checkinInput.removeEventListener('change', timeChangeHandler);
-  checkoutInput.removeEventListener('change', timeChangeHandler);
+  checkinInput.removeEventListener('change', checkinChangeHandler);
+  checkoutInput.removeEventListener('change', checkoutChangeHandler);
   roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
 
   submitButton.removeEventListener('click', submitClickHandler);
@@ -652,8 +663,8 @@ var activateForm = function () {
   titleInput.addEventListener('input', formFieldInputHandler);
   priceInput.addEventListener('input', formFieldInputHandler);
   typeInput.addEventListener('change', typeChangeHandler);
-  checkinInput.addEventListener('change', timeChangeHandler);
-  checkoutInput.addEventListener('change', timeChangeHandler);
+  checkinInput.addEventListener('change', checkinChangeHandler);
+  checkoutInput.addEventListener('change', checkoutChangeHandler);
   roomNumberInput.addEventListener('change', roomNumberChangeHandler);
 
   resetButton.addEventListener('click', resetClickHandler);
