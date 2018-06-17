@@ -128,12 +128,16 @@ var pinParams = {
  * @property {number} HEIGHT
  * @property {number} DEFAULT_OFFSET_LEFT
  * @property {number} DEFAULT_OFFSET_TOP
+ * @property {number} x
+ * @property {number} y
  */
 var mainPinParams = {
   WIDTH: 65,
   HEIGHT: 79,
   DEFAULT_OFFSET_LEFT: 570,
-  DEFAULT_OFFSET_TOP: 375
+  DEFAULT_OFFSET_TOP: 375,
+  x: 0,
+  y: 0
 };
 
 /**
@@ -515,10 +519,10 @@ var escapeKeyPressHandler = function (evt) {
   }
 };
 
-var mainPinClickHandler = function () {
+var mainPinInitialClickHandler = function () {
   activatePage();
 
-  mainPin.removeEventListener('mouseup', mainPinClickHandler);
+  mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
 };
 
 var resetClickHandler = function () {
@@ -617,6 +621,7 @@ var resetMapToInitialState = function () {
   // Восстанавливаем состояние главного маркера
   mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
   mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+  mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
 };
 
 var disableForm = function () {
@@ -654,8 +659,6 @@ var resetFormToInitialState = function () {
 var resetPage = function () {
   resetMapToInitialState();
   resetFormToInitialState();
-
-  mainPin.addEventListener('mouseup', mainPinClickHandler);
 };
 
 var activateForm = function () {
@@ -678,12 +681,35 @@ var activateForm = function () {
   resetButton.addEventListener('click', resetClickHandler);
 };
 
+var mouseMoveHandler = function (evt) {
+  var shift = {
+    x: mainPinParams.x - evt.clientX,
+    y: mainPinParams.y - evt.clientY
+  };
+
+  mainPinParams.x = evt.clientX;
+  mainPinParams.y = evt.clientY;
+
+  mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
+  mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
+
+  setAddressValue(getCoordinates(mainPin));
+};
+
+var mouseUpHandler = function () {
+  setAddressValue(getCoordinates(mainPin));
+
+  map.removeEventListener('mousemove', mouseMoveHandler);
+  document.removeEventListener('mouseup', mouseUpHandler);
+};
+
 var activateMap = function () {
   var ads = generateSimilarAds();
 
   map.classList.remove('map--faded');
 
   pinsContainer.appendChild(createPinsFragment(ads));
+
 };
 
 var activatePage = function () {
@@ -697,7 +723,15 @@ var initPage = function () {
     item.disabled = true;
   });
 
-  mainPin.addEventListener('mouseup', mainPinClickHandler);
+  // Добавляем обработчики событий на главный маркер
+  mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
+  mainPin.addEventListener('mousedown', function (evt) {
+    mainPinParams.x = evt.clientX;
+    mainPinParams.y = evt.clientY;
+
+    map.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  });
 
   setAddressValue(getCoordinates(mainPin));
 };
