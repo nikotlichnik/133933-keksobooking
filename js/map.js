@@ -538,19 +538,18 @@ var timeChangeHandler = function (evt) {
 
 var typeChangeHandler = function () {
   refreshPriceAttributes();
-  checkPriceConstraint();
-};
-
-var priceInputHandler = function () {
-  checkPriceConstraint();
 };
 
 var submitClickHandler = function () {
   highlightInvalidInputs();
 };
 
-var titleInputHandler = function () {
-  removeOutlineIfValid(titleInput);
+var formFieldInputHandler = function (evt) {
+  // Добавляем красную рамку невалидным полям
+  var field = evt.target;
+  if (field.validity.valid) {
+    field.classList.remove('ad-form__element--invalid');
+  }
 };
 
 var highlightInvalidInputs = function () {
@@ -566,22 +565,12 @@ var addRedOutline = function (element) {
   element.classList.add('ad-form__element--invalid');
 };
 
-var removeOutlineIfValid = function (element) {
-  if (element.validity.valid) {
-    element.classList.remove('ad-form__element--invalid');
-  }
-};
-
 var refreshPriceAttributes = function () {
   var type = typeInput.value;
   var minPrice = minPriceConstraints[type];
 
   priceInput.placeholder = minPrice;
   priceInput.min = minPrice;
-};
-
-var checkPriceConstraint = function () {
-  removeOutlineIfValid(priceInput);
 };
 
 var checkCapacityConstraint = function () {
@@ -628,9 +617,9 @@ var disableForm = function () {
 };
 
 var removeFormHandlers = function () {
-  titleInput.removeEventListener('input', titleInputHandler);
+  titleInput.removeEventListener('input', formFieldInputHandler);
   typeInput.removeEventListener('change', typeChangeHandler);
-  priceInput.removeEventListener('input', priceInputHandler);
+  priceInput.removeEventListener('input', formFieldInputHandler);
   checkinInput.removeEventListener('change', timeChangeHandler);
   checkoutInput.removeEventListener('change', timeChangeHandler);
   roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
@@ -643,7 +632,7 @@ var resetFormToInitialState = function () {
   adForm.reset();
   disableForm();
   inputElements.forEach(function (input) {
-    removeOutlineIfValid(input);
+    input.classList.remove('ad-form__element--invalid');
   });
 
   refreshPriceAttributes();
@@ -667,8 +656,8 @@ var activateForm = function () {
 
   submitButton.addEventListener('click', submitClickHandler);
 
-  titleInput.addEventListener('input', titleInputHandler);
-  priceInput.addEventListener('input', priceInputHandler);
+  titleInput.addEventListener('input', formFieldInputHandler);
+  priceInput.addEventListener('input', formFieldInputHandler);
   typeInput.addEventListener('change', typeChangeHandler);
   checkinInput.addEventListener('change', timeChangeHandler);
   checkoutInput.addEventListener('change', timeChangeHandler);
