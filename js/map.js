@@ -529,6 +529,11 @@ var roomNumberChangeHandler = function () {
   checkCapacityConstraint();
 };
 
+/**
+ * Устанавливает значение в поле ввода
+ * @param {HTMLInputElement} field - поле, в котором нужно установить значение
+ * @param {string} value - значение
+ */
 var setValue = function (field, value) {
   field.value = value;
 };
@@ -540,12 +545,6 @@ var checkinChangeHandler = function (evt) {
 var checkoutChangeHandler = function (evt) {
   setValue(checkinInput, evt.target.value);
 };
-
-// var timeChangeHandler = function (evt) {
-//   var time = evt.target.value;
-//   checkinInput.value = time;
-//   checkoutInput.value = time;
-// };
 
 var typeChangeHandler = function () {
   refreshPriceAttributes();
@@ -577,8 +576,12 @@ var refreshPriceAttributes = function () {
   priceInput.min = minPrice;
 };
 
+/**
+ * Блокирует для выбора варианты, которые не входят в список доступных
+ * @param {Array.<HTMLOptionElement>} options - элементы из списка для выбора
+ * @param {Array.<string>} possibleVariants - доступные варианты
+ */
 var blockUnavailableVariants = function (options, possibleVariants) {
-  // Смотрим все варианты для выбора и блокируем недоступные
   options.forEach(function (option) {
     var isPossibleVariant = possibleVariants.indexOf(option.value) !== -1;
     option.disabled = !isPossibleVariant;
