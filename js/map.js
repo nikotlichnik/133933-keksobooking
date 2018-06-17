@@ -563,12 +563,12 @@ var highlightInvalidInputs = function () {
 };
 
 var addRedOutline = function (element) {
-  element.style.outline = '2px solid red';
+  element.classList.add('ad-form__element--invalid');
 };
 
 var removeOutlineIfValid = function (element) {
   if (element.validity.valid) {
-    element.style.outline = '';
+    element.classList.remove('ad-form__element--invalid');
   }
 };
 
@@ -652,6 +652,9 @@ var removeFormHandlers = function () {
 var resetFormToInitialState = function () {
   adForm.reset();
   disableForm();
+  inputElements.forEach(function (input) {
+    removeOutlineIfValid(input);
+  });
 
   refreshPriceAttributes();
   setAddressValue(getCoordinates(mainPin));

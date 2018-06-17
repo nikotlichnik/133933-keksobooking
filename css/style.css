@@ -649,6 +649,10 @@ fieldset {
   margin-right: 14px;
 }
 
+.ad-form__element--invalid {
+  outline: 2px solid red !important;
+}
+
 .features legend {
   padding-bottom: 5px;
 }
