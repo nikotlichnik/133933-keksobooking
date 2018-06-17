@@ -112,7 +112,7 @@ var locationParams = {
 
 /**
  * Параметры маркера на карте
- * @typedef {Object} PinParams
+ * @type {Object}
  * @property {number} WIDTH
  * @property {number} HEIGHT
  */
@@ -122,14 +122,18 @@ var pinParams = {
 };
 
 /**
- * Параметры маркера выбора адреса на карте
- * @type {Object} AddressPointerParams
+ * Параметры главного маркера выбора адреса на карте
+ * @type {Object}
  * @property {number} WIDTH
  * @property {number} HEIGHT
+ * @property {number} DEFAULT_OFFSET_LEFT
+ * @property {number} DEFAULT_OFFSET_TOP
  */
 var mainPinParams = {
   WIDTH: 65,
-  HEIGHT: 87
+  HEIGHT: 79,
+  DEFAULT_OFFSET_LEFT: 570,
+  DEFAULT_OFFSET_TOP: 375
 };
 
 /**
@@ -143,6 +147,12 @@ var activeCard;
  * @type {Node}
  */
 var activePin;
+
+/**
+ * Содержит пины, открытые на карте
+ * @type {Array.<Node>}
+ */
+var pinsOnMap = [];
 
 /**
  * Параметры фотографии жилья
@@ -170,12 +180,45 @@ var offerTypesTranslation = {
   bungalo: 'Бунгало'
 };
 
+/**
+ * Минимальные цены разных типов жилья
+ * @enum {number}
+ */
+var MinPriceConstraints = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+
+/**
+ * Ограничение на связь количества гостей и комнат
+ * @enum {Array.<string>} - Возможные варианты числа гостей
+ */
+var CapacityConstraint = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
 var pinsContainer = document.querySelector('.map__pins');
 var filtersContainer = document.querySelector('.map__filters-container');
+
 var adForm = document.querySelector('.ad-form');
+var inputElements = adForm.querySelectorAll('input, select, textarea');
 var addressField = adForm.querySelector('#address');
+var titleInput = adForm.querySelector('#title');
+var typeInput = adForm.querySelector('#type');
+var priceInput = adForm.querySelector('#price');
+var checkinInput = adForm.querySelector('#timein');
+var checkoutInput = adForm.querySelector('#timeout');
+var roomNumberInput = adForm.querySelector('#room_number');
+var capacityInput = adForm.querySelector('#capacity');
+var submitButton = adForm.querySelector('.ad-form__submit');
+var resetButton = adForm.querySelector('.ad-form__reset');
 var adFieldsets = adForm.querySelectorAll('.ad-form__element');
 
 var template = document.querySelector('template');
@@ -311,7 +354,10 @@ var createPinsFragment = function (ads) {
   var fragment = document.createDocumentFragment();
 
   ads.forEach(function (item) {
-    fragment.appendChild(createPinElement(item));
+    var pin = createPinElement(item);
+
+    pinsOnMap.push(pin);
+    fragment.appendChild(pin);
   });
 
   return fragment;
@@ -475,20 +521,174 @@ var mainPinClickHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinClickHandler);
 };
 
-var activatePage = function () {
-  var ads = generateSimilarAds();
+var resetClickHandler = function () {
+  resetPage();
+};
 
-  // Убираем приветственное сообщение
-  map.classList.remove('map--faded');
+var roomNumberChangeHandler = function () {
+  checkCapacityConstraint();
+};
 
-  // Активируем элементы формы заполнения информации об объявлении
+/**
+ * Устанавливает значение в поле ввода
+ * @param {HTMLInputElement} field - поле, в котором нужно установить значение
+ * @param {string} value - значение
+ */
+var setValue = function (field, value) {
+  field.value = value;
+};
+
+var checkinChangeHandler = function (evt) {
+  setValue(checkoutInput, evt.target.value);
+};
+
+var checkoutChangeHandler = function (evt) {
+  setValue(checkinInput, evt.target.value);
+};
+
+var typeChangeHandler = function () {
+  refreshPriceAttributes();
+};
+
+var submitClickHandler = function () {
+  // Проверяем все поля на валидность
+  inputElements.forEach(function (field) {
+    // Если поле невалидно - ставим красную рамку
+    if (!field.validity.valid) {
+      field.classList.add('ad-form__element--invalid');
+    }
+  });
+};
+
+var formFieldInputHandler = function (evt) {
+  // Добавляем красную рамку невалидным полям
+  var field = evt.target;
+  if (field.validity.valid) {
+    field.classList.remove('ad-form__element--invalid');
+  }
+};
+
+var refreshPriceAttributes = function () {
+  var type = typeInput.value;
+  var minPrice = MinPriceConstraints[type];
+
+  priceInput.placeholder = minPrice;
+  priceInput.min = minPrice;
+};
+
+/**
+ * Блокирует для выбора варианты, которые не входят в список доступных
+ * @param {Array.<HTMLOptionElement>} options - элементы из списка для выбора
+ * @param {Array.<string>} possibleVariants - доступные варианты
+ */
+var blockUnavailableVariants = function (options, possibleVariants) {
+  options.forEach(function (option) {
+    var isPossibleVariant = possibleVariants.indexOf(option.value) !== -1;
+    option.disabled = !isPossibleVariant;
+  });
+};
+
+var checkCapacityConstraint = function () {
+  var numOfRooms = roomNumberInput.value;
+  var capacityVariants = CapacityConstraint[numOfRooms];
+  var isPossibleValue = capacityVariants.indexOf(capacityInput.value) !== -1;
+
+  // Если текущий выбранный вариант недоступен, то устанавливаем первый доступный
+  capacityInput.value = isPossibleValue ? capacityInput.value : capacityVariants[0];
+
+  blockUnavailableVariants(Array.from(capacityInput.options), capacityVariants);
+};
+
+var resetMapToInitialState = function () {
+  // Закрываем открытую карточку
+  if (activeCard) {
+    closeActiveCard();
+  }
+
+  // Удаляем все указатели с карты, кроме главного
+  pinsOnMap.forEach(function (item) {
+    item.parentNode.removeChild(item);
+  });
+  pinsOnMap = [];
+
+  // Ставим приветственное сообщение
+  map.classList.add('map--faded');
+
+  // Восстанавливаем состояние главного маркера
+  mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
+  mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+};
+
+var disableForm = function () {
+  adForm.classList.add('ad-form--disabled');
+  adFieldsets.forEach(function (item) {
+    item.disabled = true;
+  });
+};
+
+var removeFormHandlers = function () {
+  titleInput.removeEventListener('input', formFieldInputHandler);
+  typeInput.removeEventListener('change', typeChangeHandler);
+  priceInput.removeEventListener('input', formFieldInputHandler);
+  checkinInput.removeEventListener('change', checkinChangeHandler);
+  checkoutInput.removeEventListener('change', checkoutChangeHandler);
+  roomNumberInput.removeEventListener('change', roomNumberChangeHandler);
+
+  submitButton.removeEventListener('click', submitClickHandler);
+  resetButton.removeEventListener('click', resetClickHandler);
+};
+
+var resetFormToInitialState = function () {
+  adForm.reset();
+  disableForm();
+  inputElements.forEach(function (input) {
+    input.classList.remove('ad-form__element--invalid');
+  });
+
+  refreshPriceAttributes();
+  setAddressValue(getCoordinates(mainPin));
+
+  removeFormHandlers();
+};
+
+var resetPage = function () {
+  resetMapToInitialState();
+  resetFormToInitialState();
+
+  mainPin.addEventListener('mouseup', mainPinClickHandler);
+};
+
+var activateForm = function () {
   adForm.classList.remove('ad-form--disabled');
   adFieldsets.forEach(function (item) {
     item.disabled = false;
   });
 
-  // Добавляем маркеры в контейнер
+  checkCapacityConstraint();
+
+  submitButton.addEventListener('click', submitClickHandler);
+
+  titleInput.addEventListener('input', formFieldInputHandler);
+  priceInput.addEventListener('input', formFieldInputHandler);
+  typeInput.addEventListener('change', typeChangeHandler);
+  checkinInput.addEventListener('change', checkinChangeHandler);
+  checkoutInput.addEventListener('change', checkoutChangeHandler);
+  roomNumberInput.addEventListener('change', roomNumberChangeHandler);
+
+  resetButton.addEventListener('click', resetClickHandler);
+};
+
+var activateMap = function () {
+  var ads = generateSimilarAds();
+
+  map.classList.remove('map--faded');
+
   pinsContainer.appendChild(createPinsFragment(ads));
+};
+
+var activatePage = function () {
+  activateMap();
+  activateForm();
 };
 
 var initPage = function () {
