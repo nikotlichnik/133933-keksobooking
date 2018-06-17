@@ -541,7 +541,13 @@ var typeChangeHandler = function () {
 };
 
 var submitClickHandler = function () {
-  highlightInvalidInputs();
+  // Проверяем все поля на валидность
+  inputElements.forEach(function (field) {
+    // Если поле невалидно - ставим красную рамку
+    if (!field.validity.valid) {
+      field.classList.add('ad-form__element--invalid');
+    }
+  });
 };
 
 var formFieldInputHandler = function (evt) {
@@ -550,19 +556,6 @@ var formFieldInputHandler = function (evt) {
   if (field.validity.valid) {
     field.classList.remove('ad-form__element--invalid');
   }
-};
-
-var highlightInvalidInputs = function () {
-  inputElements.forEach(function (input) {
-    // Если поле невалидно - ставим красную рамку
-    if (!input.validity.valid) {
-      addRedOutline(input);
-    }
-  });
-};
-
-var addRedOutline = function (element) {
-  element.classList.add('ad-form__element--invalid');
 };
 
 var refreshPriceAttributes = function () {
