@@ -586,28 +586,18 @@ var checkPriceConstraint = function () {
 
 var checkCapacityConstraint = function () {
   var numOfRooms = roomNumberInput.value;
-
   var capacityVariants = capacityConstraint[numOfRooms];
+  var isPossibleValue = capacityVariants.indexOf(capacityInput.value) !== -1;
 
+  // Если текущий выбранный вариант недоступен, то устанавливаем первый доступный
+  capacityInput.value = isPossibleValue ? capacityInput.value : capacityVariants[0];
+
+  // Смотрим все варианты для выбора и блокируем недоступные
   for (var i = 0; i < capacityInput.options.length; i++) {
-    // Получаем значение текущего варианта
-    var optionValue = capacityInput.options[i].value;
-    // Проверяем отсутствие текущего варианта в доступных
-    var isAbsent = capacityVariants.indexOf(optionValue) === -1;
-    // Блокируем вариант, если отсутствует
-    capacityInput.options[i].disabled = isAbsent;
-
-    // Проверяем, выбран ли текущий вариант
-    var isSelected = capacityInput.options[i].selected;
-
-    // Если текущий заблокирован и выбран, то снимаем выделение
-    if (isSelected && isAbsent) {
-      capacityInput.options[i].selected = false;
-    }
+    var option = capacityInput.options[i].value;
+    // Блокируем вариант, если отсутствует в доступных
+    capacityInput.options[i].disabled = capacityVariants.indexOf(option) === -1;
   }
-
-  // Если поле осталось без выбранного значения, то устанавливаем первый доступный вариант
-  capacityInput.value = capacityInput.value ? capacityInput.value : capacityVariants[0];
 };
 
 var resetMapToInitialState = function () {
