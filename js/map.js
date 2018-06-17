@@ -733,16 +733,16 @@ var initPage = function () {
       y: evt.clientY
     };
 
-    var mapMouseMoveHandler = function (evt) {
+    var mapMouseMoveHandler = function (moveEvt) {
       // Получаем данные о смещении координат
       var shift = {
-        x: evt.clientX - cursorCoords.x,
-        y: evt.clientY - cursorCoords.y
+        x: moveEvt.clientX - cursorCoords.x,
+        y: moveEvt.clientY - cursorCoords.y
       };
 
       // Обновляем данные о положении курсора
-      cursorCoords.x = evt.clientX;
-      cursorCoords.y = evt.clientY;
+      cursorCoords.x = moveEvt.clientX;
+      cursorCoords.y = moveEvt.clientY;
 
       // Получаем данные о том, куда будет указывать маркер после перемещения
       var newCoords = getNewAddress(mainPin, shift.x, shift.y);
