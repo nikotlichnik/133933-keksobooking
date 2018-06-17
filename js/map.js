@@ -128,14 +128,36 @@ var pinParams = {
  * @property {number} HEIGHT
  * @property {number} DEFAULT_OFFSET_LEFT
  * @property {number} DEFAULT_OFFSET_TOP
- * @property {number} x
- * @property {number} y
  */
 var mainPinParams = {
   WIDTH: 65,
   HEIGHT: 79,
   DEFAULT_OFFSET_LEFT: 570,
-  DEFAULT_OFFSET_TOP: 375,
+  DEFAULT_OFFSET_TOP: 375
+};
+
+/**
+ * Границы изменения координаты маркера
+ * @type {Object}
+ * @property {number} TOP
+ * @property {number} BOTTOM
+ * @property {number} LEFT
+ * @property {number} RIGHT
+ */
+var mapBorders = {
+  TOP: 130,
+  BOTTOM: 630,
+  LEFT: 0,
+  RIGHT: 1200
+};
+
+/**
+ * Координаты курсора при драг'н'дропе
+ * @type {Object}
+ * @property {number} x
+ * @property {number} y
+ */
+var cursorCoords = {
   x: 0,
   y: 0
 };
@@ -456,10 +478,23 @@ var generateInfoCard = function (ad) {
  * @param {HTMLElement} pointer
  * @return {Location}
  */
-var getCoordinates = function (pointer) {
+var getAddress = function (pointer) {
   return {
     x: pointer.offsetLeft + Math.floor(mainPinParams.WIDTH / 2),
     y: pointer.offsetTop + mainPinParams.HEIGHT
+  };
+};
+
+/**
+ * @param {HTMLElement} pointer
+ * @param {number} dx
+ * @param {number} dy
+ * @return {Location}
+ */
+var getNewAddress = function (pointer, dx, dy) {
+  return {
+    x: pointer.offsetLeft + dx + Math.floor(mainPinParams.WIDTH / 2),
+    y: pointer.offsetTop + dy + mainPinParams.HEIGHT
   };
 };
 
@@ -651,7 +686,7 @@ var resetFormToInitialState = function () {
   });
 
   refreshPriceAttributes();
-  setAddressValue(getCoordinates(mainPin));
+  setAddressValue(getAddress(mainPin));
 
   removeFormHandlers();
 };
@@ -681,26 +716,37 @@ var activateForm = function () {
   resetButton.addEventListener('click', resetClickHandler);
 };
 
-var mouseMoveHandler = function (evt) {
+var mapMouseMoveHandler = function (evt) {
+  // Получаем данные о смещении координат
   var shift = {
-    x: mainPinParams.x - evt.clientX,
-    y: mainPinParams.y - evt.clientY
+    x: evt.clientX - cursorCoords.x,
+    y: evt.clientY - cursorCoords.y
   };
 
-  mainPinParams.x = evt.clientX;
-  mainPinParams.y = evt.clientY;
+  // Обновляем данные о положении маркера
+  cursorCoords.x = evt.clientX;
+  cursorCoords.y = evt.clientY;
 
-  mainPin.style.left = (mainPin.offsetLeft - shift.x) + 'px';
-  mainPin.style.top = (mainPin.offsetTop - shift.y) + 'px';
+  // Получаем данные о том, куда будет указывать маркер после перемещения
+  var newCoords = getNewAddress(mainPin, shift.x, shift.y);
 
-  setAddressValue(getCoordinates(mainPin));
+  // Перемещаем, если новый адрес попадает в заданные рамки
+  if (newCoords.y <= mapBorders.BOTTOM && newCoords.y >= mapBorders.TOP) {
+    mainPin.style.top = (mainPin.offsetTop + shift.y) + 'px';
+  }
+  if (newCoords.x <= mapBorders.RIGHT && newCoords.x >= mapBorders.LEFT) {
+    mainPin.style.left = (mainPin.offsetLeft + shift.x) + 'px';
+  }
+
+  // Обновляем поле с адресом
+  setAddressValue(getAddress(mainPin));
 };
 
-var mouseUpHandler = function () {
-  setAddressValue(getCoordinates(mainPin));
+var documentMouseUpHandler = function () {
+  setAddressValue(getAddress(mainPin));
 
-  map.removeEventListener('mousemove', mouseMoveHandler);
-  document.removeEventListener('mouseup', mouseUpHandler);
+  document.removeEventListener('mousemove', mapMouseMoveHandler);
+  document.removeEventListener('mouseup', documentMouseUpHandler);
 };
 
 var activateMap = function () {
@@ -709,7 +755,6 @@ var activateMap = function () {
   map.classList.remove('map--faded');
 
   pinsContainer.appendChild(createPinsFragment(ads));
-
 };
 
 var activatePage = function () {
@@ -726,14 +771,14 @@ var initPage = function () {
   // Добавляем обработчики событий на главный маркер
   mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
   mainPin.addEventListener('mousedown', function (evt) {
-    mainPinParams.x = evt.clientX;
-    mainPinParams.y = evt.clientY;
+    cursorCoords.x = evt.clientX;
+    cursorCoords.y = evt.clientY;
 
-    map.addEventListener('mousemove', mouseMoveHandler);
-    document.addEventListener('mouseup', mouseUpHandler);
+    document.addEventListener('mousemove', mapMouseMoveHandler);
+    document.addEventListener('mouseup', documentMouseUpHandler);
   });
 
-  setAddressValue(getCoordinates(mainPin));
+  setAddressValue(getAddress(mainPin));
 };
 
 initPage();
