@@ -593,11 +593,11 @@ var checkCapacityConstraint = function () {
   capacityInput.value = isPossibleValue ? capacityInput.value : capacityVariants[0];
 
   // Смотрим все варианты для выбора и блокируем недоступные
-  for (var i = 0; i < capacityInput.options.length; i++) {
-    var option = capacityInput.options[i].value;
-    // Блокируем вариант, если отсутствует в доступных
-    capacityInput.options[i].disabled = capacityVariants.indexOf(option) === -1;
-  }
+  Array.from(capacityInput.options).forEach(function (option) {
+    var variant = option.value;
+    var isPossibleVariant = capacityVariants.indexOf(variant) !== -1;
+    option.disabled = !isPossibleVariant;
+  });
 };
 
 var resetMapToInitialState = function () {
