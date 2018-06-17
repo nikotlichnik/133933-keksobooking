@@ -194,13 +194,13 @@ var minPriceConstraints = {
 /**
  * Ограничение на связь количества гостей и комнат
  * @type {Object}
- * @enum {Array.<numbers>} - Возможные варианты числа гостей
+ * @enum {Array.<string>} - Возможные варианты числа гостей
  */
 var capacityConstraint = {
-  '1': [1],
-  '2': [1, 2],
-  '3': [1, 2, 3],
-  '100': [0]
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
 };
 
 var map = document.querySelector('.map');
@@ -591,7 +591,7 @@ var checkCapacityConstraint = function () {
 
   for (var i = 0; i < capacityInput.options.length; i++) {
     // Получаем значение текущего варианта
-    var optionValue = parseInt(capacityInput.options[i].value, 10);
+    var optionValue = capacityInput.options[i].value;
     // Проверяем отсутствие текущего варианта в доступных
     var isAbsent = capacityVariants.indexOf(optionValue) === -1;
     // Блокируем вариант, если отсутствует
