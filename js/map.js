@@ -577,6 +577,14 @@ var refreshPriceAttributes = function () {
   priceInput.min = minPrice;
 };
 
+var blockUnavailableVariants = function (options, possibleVariants) {
+  // Смотрим все варианты для выбора и блокируем недоступные
+  options.forEach(function (option) {
+    var isPossibleVariant = possibleVariants.indexOf(option.value) !== -1;
+    option.disabled = !isPossibleVariant;
+  });
+};
+
 var checkCapacityConstraint = function () {
   var numOfRooms = roomNumberInput.value;
   var capacityVariants = CapacityConstraint[numOfRooms];
@@ -585,12 +593,7 @@ var checkCapacityConstraint = function () {
   // Если текущий выбранный вариант недоступен, то устанавливаем первый доступный
   capacityInput.value = isPossibleValue ? capacityInput.value : capacityVariants[0];
 
-  // Смотрим все варианты для выбора и блокируем недоступные
-  Array.from(capacityInput.options).forEach(function (option) {
-    var variant = option.value;
-    var isPossibleVariant = capacityVariants.indexOf(variant) !== -1;
-    option.disabled = !isPossibleVariant;
-  });
+  blockUnavailableVariants(Array.from(capacityInput.options), capacityVariants);
 };
 
 var resetMapToInitialState = function () {
@@ -657,6 +660,8 @@ var activateForm = function () {
   adFieldsets.forEach(function (item) {
     item.disabled = false;
   });
+
+  checkCapacityConstraint();
 
   submitButton.addEventListener('click', submitClickHandler);
 
