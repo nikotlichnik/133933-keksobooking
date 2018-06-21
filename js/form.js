@@ -5,7 +5,6 @@
  */
 
 (function () {
-  var mainPin = document.querySelector('.map__pin--main');
   var adForm = document.querySelector('.ad-form');
   var inputElements = adForm.querySelectorAll('input, select, textarea');
   var addressField = adForm.querySelector('#address');
@@ -158,7 +157,7 @@
     });
 
     refreshPriceAttributes();
-    setAddressValue(window.map.getAddress(mainPin));
+    setAddressValue(window.map.getAddress());
 
     removeFormHandlers();
   };

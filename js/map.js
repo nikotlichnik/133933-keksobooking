@@ -90,26 +90,19 @@
   };
 
   /**
-   * @param {HTMLElement} pointer
-   * @return {Location}
-   */
-  var getAddress = function (pointer) {
-    return {
-      x: pointer.offsetLeft + Math.floor(mainPinParams.WIDTH / 2),
-      y: pointer.offsetTop + mainPinParams.HEIGHT
-    };
-  };
-
-  /**
-   * @param {HTMLElement} pointer
+   * Возвращает адрес, на который указывает главный маркер
+   * Если переданы параметры dx и dy, то возвращает адрес со смещением
    * @param {number} dx
    * @param {number} dy
    * @return {Location}
    */
-  var getNewAddress = function (pointer, dx, dy) {
+  var getMainPinAddress = function (dx, dy) {
+    dx = dx ? dx : 0;
+    dy = dy ? dy : 0;
+
     return {
-      x: pointer.offsetLeft + dx + Math.floor(mainPinParams.WIDTH / 2),
-      y: pointer.offsetTop + dy + mainPinParams.HEIGHT
+      x: mainPin.offsetLeft + dx + Math.floor(mainPinParams.WIDTH / 2),
+      y: mainPin.offsetTop + dy + mainPinParams.HEIGHT
     };
   };
 
@@ -159,7 +152,7 @@
       cursorCoords.y = moveEvt.clientY;
 
       // Получаем данные о том, куда будет указывать маркер после перемещения
-      var newCoords = getNewAddress(mainPin, shift.x, shift.y);
+      var newCoords = getMainPinAddress(shift.x, shift.y);
 
       // Перемещаем, если новый адрес попадает в заданные рамки
       if (newCoords.y <= mapBorders.BOTTOM && newCoords.y >= mapBorders.TOP) {
@@ -170,11 +163,11 @@
       }
 
       // Обновляем поле с адресом
-      window.form.setAddressValue(getAddress(mainPin));
+      window.form.setAddressValue(getMainPinAddress());
     };
 
     var documentMouseUpHandler = function () {
-      window.form.setAddressValue(getAddress(mainPin));
+      window.form.setAddressValue(getMainPinAddress());
 
       document.removeEventListener('mousemove', mapMouseMoveHandler);
       document.removeEventListener('mouseup', documentMouseUpHandler);
@@ -184,11 +177,11 @@
     document.addEventListener('mouseup', documentMouseUpHandler);
   });
 
-  window.form.setAddressValue(getAddress(mainPin));
+  window.form.setAddressValue(getMainPinAddress());
 
   window.map = {
     insertCard: insertCard,
-    getAddress: getAddress,
+    getAddress: getMainPinAddress,
     reset: resetMapToInitialState
   };
 })();
