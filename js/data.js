@@ -6,12 +6,6 @@
 
 (function () {
   /**
-   * Число генерируемых объявлений
-   * @type {number}
-   */
-  var NUM_OF_ADS = 8;
-
-  /**
    * Описание автора объявления
    * @typedef {Object} Author
    * @property {string} avatar - Путь к файлу аватарки
@@ -166,11 +160,14 @@
     return shuffledFeatures.slice(0, randomIndex);
   };
 
+
   /**
+   * @function generateAd
+   * @memberOf Data
    * @param {number} adIndex - Индекс генерируемого объявления
    * @return {Ad} Объявление
    */
-  var generateSimilarAd = function (adIndex) {
+  window.generateAd = function (adIndex) {
     var x = getRandomNumberInRange(locationParams.X.MIN, locationParams.X.MAX);
     var y = getRandomNumberInRange(locationParams.Y.MIN, locationParams.Y.MAX);
 
@@ -196,24 +193,6 @@
         y: y
       }
     };
-  };
-
-
-  window.data = {
-    /**
-     * @function generateAds
-     * @memberOf Data
-     * @return {Array.<Ad>} - Массив с объектами, описывающими объявления
-     */
-    generateAds: function () {
-      var randomAds = [];
-
-      for (var i = 0; i < NUM_OF_ADS; i++) {
-        randomAds.push(generateSimilarAd(i));
-      }
-
-      return randomAds;
-    }
   };
 
 })();

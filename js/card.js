@@ -37,7 +37,7 @@
    * @param {string} feature - Удобство
    * @return {HTMLLIElement} - Элемент списка удобств
    */
-  var createFeatureItem = function (feature) {
+  var createFeature = function (feature) {
     var featureItem = document.createElement('li');
 
     featureItem.classList.add('popup__feature', 'popup__feature--' + feature);
@@ -49,7 +49,7 @@
    * @param {string} photo - Путь к фотографии
    * @return {Node} - Элемент c фотографией
    */
-  var createPhotoElement = function (photo) {
+  var createPhoto = function (photo) {
     var photoElement = document.createElement('img');
 
     photoElement.classList.add(photoParams.CLASS_NAME);
@@ -65,7 +65,7 @@
    * @param {Ad} ad - Объявление
    * @return {Node} - Элемент карточки с объявлением
    */
-  var generateInfoCard = function (ad) {
+  var createCard = function (ad) {
     var card = cardTemplate.cloneNode(true);
     var featuresList = card.querySelector('.popup__features');
     var photosList = card.querySelector('.popup__photos');
@@ -97,7 +97,7 @@
 
     if (features.length !== 0) {
       features.forEach(function (feature) {
-        featuresList.appendChild(createFeatureItem(feature));
+        featuresList.appendChild(createFeature(feature));
       });
     } else {
       card.removeChild(featuresList);
@@ -105,7 +105,7 @@
 
     if (photos.length !== 0) {
       photos.forEach(function (photo) {
-        photosList.appendChild(createPhotoElement(photo));
+        photosList.appendChild(createPhoto(photo));
       });
     } else {
       card.removeChild(photosList);
@@ -119,6 +119,6 @@
   };
 
   window.card = {
-    generate: generateInfoCard
+    generate: createCard
   };
 })();

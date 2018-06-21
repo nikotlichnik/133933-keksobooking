@@ -10,6 +10,12 @@
    */
   var ESC_KEYCODE = 27;
 
+  /**
+   * Число генерируемых объявлений
+   * @type {number}
+   */
+  var NUM_OF_ADS = 8;
+
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
   var filtersContainer = map.querySelector('.map__filters-container');
@@ -64,7 +70,12 @@
   var pinsOnMap = [];
 
   var activateMap = function () {
-    var ads = window.data.generateAds();
+
+    var ads = [];
+
+    for (var i = 0; i < NUM_OF_ADS; i++) {
+      ads.push(window.generateAd(i));
+    }
 
     map.classList.remove('map--faded');
 
