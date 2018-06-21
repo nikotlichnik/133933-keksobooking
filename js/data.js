@@ -104,42 +104,6 @@
     }
   };
 
-
-  /**
-   * Возвращает случайно перемешанную копию массива (тасование Фишера — Йетса)
-   * @param {Array} array
-   * @return {Array} - Перемешанная копия массива
-   */
-  var getShuffledArray = function (array) {
-    var shuffledArray = array.slice(0);
-
-    for (var i = array.length - 1; i > 0; i--) {
-      var swapIndex = Math.round(Math.random() * i);
-      var swap = shuffledArray[swapIndex];
-      shuffledArray[swapIndex] = shuffledArray[i];
-      shuffledArray[i] = swap;
-    }
-
-    return shuffledArray;
-  };
-
-  /**
-   * @param {Array} array
-   * @return {number} - Индекс случайного элемента из массива
-   */
-  var getRandomIndexOfArray = function (array) {
-    return Math.floor(Math.random() * array.length);
-  };
-
-  /**
-   * @param {number} startNumber - Нижняя граница диапазона
-   * @param {number} finishNumber - Верхняя граница диапазона
-   * @return {number} - Случайное число в заданном диапазоне, включая концы интервала
-   */
-  var getRandomNumberInRange = function (startNumber, finishNumber) {
-    return startNumber + Math.round(Math.random() * (finishNumber - startNumber));
-  };
-
   /**
    * @param {number} elementNumber - Номер изображения
    * @return {string} - Путь к изображению с указанным номером
@@ -154,8 +118,8 @@
    * @return {Array.<string>} - Случайный набор удобств
    */
   var getAdFeatures = function () {
-    var shuffledFeatures = getShuffledArray(offerParams.FEATURES);
-    var randomIndex = getRandomIndexOfArray(shuffledFeatures);
+    var shuffledFeatures = window.utils.getShuffledArray(offerParams.FEATURES);
+    var randomIndex = window.utils.getRandomIndexOfArray(shuffledFeatures);
 
     return shuffledFeatures.slice(0, randomIndex);
   };
@@ -168,8 +132,8 @@
    * @return {Ad} Объявление
    */
   window.generateAd = function (adIndex) {
-    var x = getRandomNumberInRange(locationParams.X.MIN, locationParams.X.MAX);
-    var y = getRandomNumberInRange(locationParams.Y.MIN, locationParams.Y.MAX);
+    var x = window.utils.getRandomNumberInRange(locationParams.X.MIN, locationParams.X.MAX);
+    var y = window.utils.getRandomNumberInRange(locationParams.Y.MIN, locationParams.Y.MAX);
 
     return {
       author: {
@@ -178,12 +142,12 @@
       offer: {
         title: offerParams.TITLES[adIndex],
         address: x + ', ' + y,
-        price: getRandomNumberInRange(offerParams.PRICE.MIN, offerParams.PRICE.MAX),
-        type: offerParams.TYPES[getRandomIndexOfArray(offerParams.TYPES)],
-        rooms: getRandomNumberInRange(offerParams.ROOMS.MIN, offerParams.ROOMS.MAX),
-        guests: getRandomNumberInRange(offerParams.GUESTS.MIN, offerParams.GUESTS.MAX),
-        checkin: offerParams.CHECKINS[getRandomIndexOfArray(offerParams.CHECKINS)],
-        checkout: offerParams.CHECKOUTS[getRandomIndexOfArray(offerParams.CHECKOUTS)],
+        price: window.utils.getRandomNumberInRange(offerParams.PRICE.MIN, offerParams.PRICE.MAX),
+        type: offerParams.TYPES[window.utils.getRandomIndexOfArray(offerParams.TYPES)],
+        rooms: window.utils.getRandomNumberInRange(offerParams.ROOMS.MIN, offerParams.ROOMS.MAX),
+        guests: window.utils.getRandomNumberInRange(offerParams.GUESTS.MIN, offerParams.GUESTS.MAX),
+        checkin: offerParams.CHECKINS[window.utils.getRandomIndexOfArray(offerParams.CHECKINS)],
+        checkout: offerParams.CHECKOUTS[window.utils.getRandomIndexOfArray(offerParams.CHECKOUTS)],
         features: getAdFeatures(),
         description: '',
         photos: offerParams.PHOTOS
