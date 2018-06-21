@@ -145,7 +145,7 @@
     if (activeCard) {
       closeActiveCard();
     }
-    activeCard = window.card.generate(ad);
+    activeCard = createCard(ad);
 
     window.map.insertCard(activeCard);
     document.addEventListener('keydown', escapeKeyPressHandler);
@@ -166,7 +166,6 @@
   };
 
   window.card = {
-    generate: createCard,
     open: openCard,
     closeActive: closeActiveCard
   };
