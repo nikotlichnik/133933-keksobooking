@@ -19,6 +19,29 @@
   };
 
   /**
+   * Содержит ссылку на пин, карточка которого открыта
+   * @type {Node}
+   */
+  var activePin;
+
+  /**
+   * Добавляет класс пину, карточка которого открыта, и сохраняет ссылку на него
+   * @param {Node} pin
+   */
+  var setActivePin = function (pin) {
+    activePin = pin;
+    activePin.classList.add('map__pin--active');
+  };
+
+  /**
+   * Убирает класс у активного пина и сбрасывает ссылку на него
+   */
+  var deactivatePin = function () {
+    activePin.classList.remove('map__pin--active');
+    activePin = null;
+  };
+
+  /**
    * @param {Ad} ad - Объявление
    * @return {Node} - Маркер для карты
    */
@@ -28,7 +51,7 @@
 
     pinElement.addEventListener('click', function () {
       window.map.openCard(ad);
-      window.map.setActivePin(pinElement);
+      setActivePin(pinElement);
     });
 
     pinElement.style.left = (ad.location.x - pinParams.WIDTH / 2) + 'px';
@@ -40,6 +63,7 @@
   };
 
   window.pin = {
-    create: createPinElement
+    create: createPinElement,
+    deactivate: deactivatePin
   };
 })();

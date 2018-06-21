@@ -58,12 +58,6 @@
   var activeCard;
 
   /**
-   * Содержит ссылку на пин, карточка которого открыта
-   * @type {Node}
-   */
-  var activePin;
-
-  /**
    * Содержит пины, открытые на карте
    * @type {Array.<Node>}
    */
@@ -124,26 +118,9 @@
     activeCard.parentNode.removeChild(activeCard);
     activeCard = null;
 
-    deactivatePin();
+    window.pin.deactivate();
 
     document.removeEventListener('keydown', escapeKeyPressHandler);
-  };
-
-  /**
-   * Добавляет класс пину, карточка которого открыта, и сохраняет ссылку на него
-   * @param {Node} pin
-   */
-  var setActivePin = function (pin) {
-    activePin = pin;
-    activePin.classList.add('map__pin--active');
-  };
-
-  /**
-   * Убирает класс у активного пина и сбрасывает ссылку на него
-   */
-  var deactivatePin = function () {
-    activePin.classList.remove('map__pin--active');
-    activePin = null;
   };
 
   var escapeKeyPressHandler = function (evt) {
@@ -249,7 +226,6 @@
   window.form.setAddressValue(getAddress(mainPin));
 
   window.map = {
-    setActivePin: setActivePin,
     openCard: openCard,
     closeActiveCard: closeActiveCard,
     getAddress: getAddress,
