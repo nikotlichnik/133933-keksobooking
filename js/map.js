@@ -6,19 +6,15 @@
 
 (function () {
   /**
-   * @constant {number}
-   */
-  var ESC_KEYCODE = 27;
-
-  /**
    * Число генерируемых объявлений
    * @type {number}
    */
   var NUM_OF_ADS = 8;
 
+
   var map = document.querySelector('.map');
-  var mainPin = map.querySelector('.map__pin--main');
   var filtersContainer = map.querySelector('.map__filters-container');
+  var mainPin = map.querySelector('.map__pin--main');
   var pinsContainer = map.querySelector('.map__pins');
 
   /**
@@ -52,12 +48,6 @@
   };
 
   /**
-   * Содержит ссылку на открытую карточку с информацией
-   * @type {Node}
-   */
-  var activeCard;
-
-  /**
    * Содержит пины, открытые на карте
    * @type {Array.<Node>}
    */
@@ -77,11 +67,6 @@
   };
 
   var resetMapToInitialState = function () {
-    // Закрываем открытую карточку
-    if (activeCard) {
-      closeActiveCard();
-    }
-
     // Удаляем все указатели с карты, кроме главного
     pinsOnMap.forEach(function (item) {
       item.parentNode.removeChild(item);
@@ -95,38 +80,6 @@
     mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
     mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
     mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
-  };
-
-  /**
-   * Закрывает открытую карточку, если такая есть, и открывает новую
-   * @param {Ad} ad - Объявление
-   */
-  var openCard = function (ad) {
-    if (activeCard) {
-      closeActiveCard();
-    }
-    activeCard = window.card.generate(ad);
-
-    map.insertBefore(activeCard, filtersContainer);
-    document.addEventListener('keydown', escapeKeyPressHandler);
-  };
-
-  /**
-   * Закрывает открытую карточку и сбрасывает ссылку на неё
-   */
-  var closeActiveCard = function () {
-    activeCard.parentNode.removeChild(activeCard);
-    activeCard = null;
-
-    window.pin.deactivate();
-
-    document.removeEventListener('keydown', escapeKeyPressHandler);
-  };
-
-  var escapeKeyPressHandler = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeActiveCard();
-    }
   };
 
   var mainPinInitialClickHandler = function () {
@@ -175,6 +128,14 @@
     });
 
     return fragment;
+  };
+
+  /**
+   * Вставляет карточку с информацией в разметку
+   * @param {Node} card
+   */
+  var insertCard = function (card) {
+    map.insertBefore(card, filtersContainer);
   };
 
   // Добавляем обработчики событий на главный маркер
@@ -226,8 +187,7 @@
   window.form.setAddressValue(getAddress(mainPin));
 
   window.map = {
-    openCard: openCard,
-    closeActiveCard: closeActiveCard,
+    insertCard: insertCard,
     getAddress: getAddress,
     reset: resetMapToInitialState
   };

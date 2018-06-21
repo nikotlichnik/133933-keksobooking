@@ -106,7 +106,8 @@
 
   var resetClickHandler = function () {
     window.map.reset();
-    // reset();
+    window.card.closeActive();
+
     resetFormToInitialState();
   };
 

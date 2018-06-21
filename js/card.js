@@ -5,7 +5,19 @@
  */
 
 (function () {
+
+  /**
+   * @constant {number}
+   */
+  var ESC_KEYCODE = 27;
+
   var cardTemplate = document.querySelector('template').content.querySelector('.map__card');
+
+  /**
+   * Содержит ссылку на открытую карточку с информацией
+   * @type {Node}
+   */
+  var activeCard;
 
   /**
    * Параметры фотографии жилья
@@ -112,13 +124,50 @@
     }
 
     closeCardButton.addEventListener('click', function () {
-      window.map.closeActiveCard();
+      closeActiveCard();
     });
 
     return card;
   };
 
+
+  var escapeKeyPressHandler = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      closeActiveCard();
+    }
+  };
+
+  /**
+   * Закрывает открытую карточку, если такая есть, и открывает новую
+   * @param {Ad} ad - Объявление
+   */
+  var openCard = function (ad) {
+    if (activeCard) {
+      closeActiveCard();
+    }
+    activeCard = window.card.generate(ad);
+
+    window.map.insertCard(activeCard);
+    document.addEventListener('keydown', escapeKeyPressHandler);
+  };
+
+  /**
+   * Закрывает открытую карточку и сбрасывает ссылку на неё
+   */
+  var closeActiveCard = function () {
+    if (activeCard) {
+      activeCard.parentNode.removeChild(activeCard);
+      activeCard = null;
+
+      window.pin.deactivate();
+
+      document.removeEventListener('keydown', escapeKeyPressHandler);
+    }
+  };
+
   window.card = {
-    generate: createCard
+    generate: createCard,
+    open: openCard,
+    closeActive: closeActiveCard
   };
 })();

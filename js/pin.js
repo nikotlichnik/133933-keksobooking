@@ -50,7 +50,7 @@
     var pinImage = pinElement.querySelector('img');
 
     pinElement.addEventListener('click', function () {
-      window.map.openCard(ad);
+      window.card.open(ad);
       setActivePin(pinElement);
     });
 
