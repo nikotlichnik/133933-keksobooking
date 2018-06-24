@@ -52,14 +52,7 @@
    */
   var pinsOnMap = [];
 
-  var activateMap = function () {
-
-    var ads = [];
-
-    for (var i = 0; i < NUM_OF_ADS; i++) {
-      ads.push(window.generateAd(i));
-    }
-
+  var activateMap = function (ads) {
     map.classList.remove('map--faded');
 
     pinsContainer.appendChild(createPinsFragment(ads));
@@ -82,7 +75,7 @@
   };
 
   var mainPinInitialClickHandler = function () {
-    activateMap();
+    window.backend.download(activateMap);
     window.form.activate();
 
     mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
