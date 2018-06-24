@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @namespace Backend
+ */
+
 (function () {
   var DOWNLOAD_URL = 'https://js.dump.academy/keksobooking/data';
   var UPLOAD_URL = 'https://js.dump.academy/keksobooking';
@@ -34,18 +38,18 @@
 
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
-        onLoad(xhr.responseText);
+        onLoad();
       } else {
-        onError('Ошибка ' + xhr.status + ': ' + xhr.statusText);
+        onError('Форма не отправлена. Ошибка ' + xhr.status);
       }
     });
 
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
+      onError('Форма не отправлена. Произошла ошибка соединения');
     });
 
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      onError('Форма не отправлена. Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
     xhr.open('POST', UPLOAD_URL);

@@ -18,6 +18,8 @@
   var submitButton = adForm.querySelector('.ad-form__submit');
   var resetButton = adForm.querySelector('.ad-form__reset');
   var adFieldsets = adForm.querySelectorAll('.ad-form__element');
+  var formSuccessElement = document.querySelector('.success');
+  var formErrorElement = document.querySelector('.error');
 
   /**
    * Минимальные цены разных типов жилья
@@ -93,7 +95,7 @@
     checkCapacityConstraint();
   };
 
-  var submitClickHandler = function () {
+  var checkFields = function () {
     // Проверяем все поля на валидность
     inputElements.forEach(function (field) {
       // Если поле невалидно - ставим красную рамку
@@ -103,11 +105,35 @@
     });
   };
 
+  /**
+   * @param {string} messageText
+   */
+  var errorFormSendHandler = function (messageText) {
+    window.message.show(formErrorElement, messageText);
+  };
+
+  var successFormSendHandler = function () {
+    resetFieldsValues();
+    window.message.show(formSuccessElement);
+  };
+
+  var submitClickHandler = function (evt) {
+    evt.preventDefault();
+
+    if (adForm.checkValidity()) {
+      window.backend.upload(new FormData(adForm), successFormSendHandler, errorFormSendHandler);
+    } else {
+      checkFields();
+    }
+  };
+
   var resetClickHandler = function () {
     window.map.reset();
     window.card.closeActive();
 
-    resetFormToInitialState();
+    resetFieldsValues();
+    disableForm();
+    removeFormHandlers();
   };
 
   /**
@@ -149,19 +175,6 @@
     blockUnavailableVariants(Array.from(capacityInput.options), capacityVariants);
   };
 
-  var resetFormToInitialState = function () {
-    adForm.reset();
-    disableForm();
-    inputElements.forEach(function (input) {
-      input.classList.remove('ad-form__element--invalid');
-    });
-
-    refreshPriceAttributes();
-    setAddressValue(window.map.getAddress());
-
-    removeFormHandlers();
-  };
-
   var disableForm = function () {
     adForm.classList.add('ad-form--disabled');
     adFieldsets.forEach(function (item) {
@@ -179,6 +192,17 @@
 
     submitButton.removeEventListener('click', submitClickHandler);
     resetButton.removeEventListener('click', resetClickHandler);
+  };
+
+  var resetFieldsValues = function () {
+    adForm.reset();
+
+    inputElements.forEach(function (input) {
+      input.classList.remove('ad-form__element--invalid');
+    });
+
+    refreshPriceAttributes();
+    setAddressValue(window.map.getAddress());
   };
 
   // Блокируем поля форм

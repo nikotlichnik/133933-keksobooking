@@ -5,12 +5,6 @@
  */
 
 (function () {
-  /**
-   * Число генерируемых объявлений
-   * @type {number}
-   */
-  var NUM_OF_ADS = 8;
-
   var map = document.querySelector('.map');
   var filtersContainer = map.querySelector('.map__filters-container');
   var mainPin = map.querySelector('.map__pin--main');
