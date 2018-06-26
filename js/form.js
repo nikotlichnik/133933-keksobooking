@@ -109,7 +109,8 @@
    * @param {string} messageText
    */
   var errorFormSendHandler = function (messageText) {
-    window.message.show(formErrorElement, messageText);
+    var errorText = 'Форма не отправлена. ' + messageText;
+    window.message.show(formErrorElement, errorText);
   };
 
   var successFormSendHandler = function () {

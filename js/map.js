@@ -78,7 +78,8 @@
    * @param {string} messageText
    */
   var errorDownloadHandler = function (messageText) {
-    window.message.show(mapErrorElement, messageText);
+    var errorText = 'Не удалось загрузить данные. ' + messageText;
+    window.message.show(mapErrorElement, errorText);
   };
 
   var mainPinInitialClickHandler = function () {
