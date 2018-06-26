@@ -17,7 +17,7 @@
       if (xhr.status === 200) {
         onLoad(xhr.response);
       } else {
-        onError('Ошибка ' + xhr.status + ': ' + xhr.statusText);
+        onError('Ошибка ' + xhr.status);
       }
     });
 
