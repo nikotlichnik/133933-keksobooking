@@ -4,6 +4,43 @@
  * @namespace Map
  */
 
+/**
+ * Описание автора объявления
+ * @typedef {Object} Author
+ * @property {string} avatar - Путь к файлу аватарки
+ */
+
+/**
+ * Детали объявления
+ * @typedef {Object} Offer
+ * @property {string} title - Заголовок
+ * @property {string} address - Адрес жилья
+ * @property {number} price - Цена за ночь
+ * @property {string} type - Тип жилья
+ * @property {number} rooms - Количество комнат
+ * @property {number} guests - Количество размещаемых гостей
+ * @property {string} checkin - Время заселения
+ * @property {string} checkout - Время выселения
+ * @property {Array.<string>} features - Удобства в жилье
+ * @property {string} description - Описание жилья
+ * @property {Array.<string>} photos - Пути к фотографиям жилья
+ */
+
+/**
+ * Местоположение объекта
+ * @typedef {Object} Location
+ * @property {number} x - Координата x
+ * @property {number} y - Координата y
+ */
+
+/**
+ * Объявление
+ * @typedef {Object} Ad
+ * @property {Author} author
+ * @property {Offer} offer
+ * @property {Location} location
+ */
+
 (function () {
   var map = document.querySelector('.map');
   var filtersContainer = map.querySelector('.map__filters-container');
