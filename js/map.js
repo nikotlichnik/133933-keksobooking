@@ -4,17 +4,49 @@
  * @namespace Map
  */
 
-(function () {
-  /**
-   * Число генерируемых объявлений
-   * @type {number}
-   */
-  var NUM_OF_ADS = 8;
+/**
+ * Описание автора объявления
+ * @typedef {Object} Author
+ * @property {string} avatar - Путь к файлу аватарки
+ */
 
+/**
+ * Детали объявления
+ * @typedef {Object} Offer
+ * @property {string} title - Заголовок
+ * @property {string} address - Адрес жилья
+ * @property {number} price - Цена за ночь
+ * @property {string} type - Тип жилья
+ * @property {number} rooms - Количество комнат
+ * @property {number} guests - Количество размещаемых гостей
+ * @property {string} checkin - Время заселения
+ * @property {string} checkout - Время выселения
+ * @property {Array.<string>} features - Удобства в жилье
+ * @property {string} description - Описание жилья
+ * @property {Array.<string>} photos - Пути к фотографиям жилья
+ */
+
+/**
+ * Местоположение объекта
+ * @typedef {Object} Location
+ * @property {number} x - Координата x
+ * @property {number} y - Координата y
+ */
+
+/**
+ * Объявление
+ * @typedef {Object} Ad
+ * @property {Author} author
+ * @property {Offer} offer
+ * @property {Location} location
+ */
+
+(function () {
   var map = document.querySelector('.map');
   var filtersContainer = map.querySelector('.map__filters-container');
   var mainPin = map.querySelector('.map__pin--main');
   var pinsContainer = map.querySelector('.map__pins');
+  var mapErrorElement = document.querySelector('.error');
 
   /**
    * Параметры главного маркера выбора адреса на карте
@@ -52,19 +84,6 @@
    */
   var pinsOnMap = [];
 
-  var activateMap = function () {
-
-    var ads = [];
-
-    for (var i = 0; i < NUM_OF_ADS; i++) {
-      ads.push(window.generateAd(i));
-    }
-
-    map.classList.remove('map--faded');
-
-    pinsContainer.appendChild(createPinsFragment(ads));
-  };
-
   var resetMapToInitialState = function () {
     // Удаляем все указатели с карты, кроме главного
     pinsOnMap.forEach(function (item) {
@@ -81,11 +100,27 @@
     mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
   };
 
-  var mainPinInitialClickHandler = function () {
-    activateMap();
-    window.form.activate();
+  /**
+   * @param {Array.<Ad>} ads - Массив объявлений
+   */
+  var successDownloadHandler = function (ads) {
+    map.classList.remove('map--faded');
+    pinsContainer.appendChild(createPinsFragment(ads));
 
+    window.form.activate();
     mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
+  };
+
+  /**
+   * @param {string} messageText
+   */
+  var errorDownloadHandler = function (messageText) {
+    var errorText = 'Не удалось загрузить данные. ' + messageText;
+    window.message.show(mapErrorElement, errorText);
+  };
+
+  var mainPinInitialClickHandler = function () {
+    window.backend.download(successDownloadHandler, errorDownloadHandler);
   };
 
   /**

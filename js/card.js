@@ -5,12 +5,6 @@
  */
 
 (function () {
-
-  /**
-   * @constant {number}
-   */
-  var ESC_KEYCODE = 27;
-
   var cardTemplate = document.querySelector('template').content.querySelector('.map__card');
 
   /**
@@ -130,11 +124,8 @@
     return card;
   };
 
-
   var escapeKeyPressHandler = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeActiveCard();
-    }
+    window.utils.isEscEvent(evt, closeActiveCard);
   };
 
   /**
