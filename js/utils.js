@@ -13,7 +13,7 @@
   /**
    * @constant {number} в миллисекундах
    */
-  var DEBOUNCE_INTERVAL = 300;
+  var DEBOUNCE_INTERVAL = 500;
 
   /**
    * Вызывает функцию коллбэк, если нажат Escape
