@@ -25,14 +25,14 @@
   var priceValues = {
     low: {
       MIN: 0,
-      MAX: 10000
+      MAX: 9999
     },
     middle: {
       MIN: 10000,
       MAX: 50000
     },
     high: {
-      MIN: 50000,
+      MIN: 50001,
       MAX: 10000000
     }
   };
