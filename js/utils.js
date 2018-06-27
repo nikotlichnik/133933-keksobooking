@@ -29,10 +29,10 @@
   /**
    * Возвращает функцию, у которой будет свой таймер и она будет контролировать
    * свое выполнение самостоятельно
-   * @param {function} fun
+   * @param {function} cb
    * @return {function}
    */
-  var debounce = function (fun) {
+  var debounce = function (cb) {
     var lastTimeout = null;
 
     return function () {
@@ -41,7 +41,7 @@
         window.clearTimeout(lastTimeout);
       }
       lastTimeout = window.setTimeout(function () {
-        fun.apply(null, args);
+        cb.apply(null, args);
       }, DEBOUNCE_INTERVAL);
     };
   };
