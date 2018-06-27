@@ -138,7 +138,7 @@
   var applyPinsFilter = function () {
     window.card.closeActive();
 
-    var ads = window.map.similarAds.slice(0);
+    var ads = window.map.similarAds.slice();
     window.map.update(ads.filter(isMatchFilter));
   };
 

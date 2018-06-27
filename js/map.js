@@ -118,7 +118,7 @@
    * @param {Array.<Ad>} ads - Массив объявлений
    */
   var successDownloadHandler = function (ads) {
-    window.map.similarAds = ads.slice(0);
+    window.map.similarAds = ads.slice();
 
     map.classList.remove('map--faded');
     pinsContainer.appendChild(createPinsFragment(ads));
