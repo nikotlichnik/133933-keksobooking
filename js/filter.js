@@ -145,16 +145,16 @@
   Array.from(filterCheckboxes).forEach(function (item) {
     item.addEventListener('change', function (evt) {
       filter[evt.target.id] = evt.target.checked;
-      applyPinsFilter();
     });
   });
 
   Array.from(filterSelects).forEach(function (item) {
     item.addEventListener('change', function (evt) {
       filter[evt.target.id] = evt.target.value;
-      applyPinsFilter();
     });
   });
+
+  filterForm.addEventListener('change', window.utils.debounce(applyPinsFilter));
 
   window.resetFilter = resetFilter;
 })();
