@@ -14,6 +14,7 @@
 (function () {
   var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
   var HOUSING_PARAMS = ['type', 'rooms', 'guests'];
+  var PRICE_PARAM = 'price';
 
   var filterForm = document.querySelector('.map__filters');
   var filterSelects = filterForm.querySelectorAll('select');
@@ -22,7 +23,7 @@
   /**
    * @enum {Range}
    */
-  var priceValues = {
+  var PriceValue = {
     low: {
       MIN: 0,
       MAX: 9999
@@ -37,73 +38,66 @@
     }
   };
 
-  var filter = {
-    'housing-type': 'any',
-    'housing-price': 'any',
-    'housing-rooms': 'any',
-    'housing-guests': 'any',
-    'filter-wifi': false,
-    'filter-dishwasher': false,
-    'filter-parking': false,
-    'filter-washer': false,
-    'filter-elevator': false,
-    'filter-conditioner': false
+  /**
+   * @const {Object}
+   * @property {boolean} checkbox
+   * @property {string} select
+   */
+  var ANY_VALUE = {
+    checkbox: false,
+    select: 'any'
   };
+
+  /**
+   * @enum {string}
+   */
+  var Prefix = {
+    features: 'filter-',
+    offer: 'housing-'
+  };
+
+  var filter = {};
 
   /**
    * Сбрасывает состояние фильтра в исходное состояние
    */
   var resetFilter = function () {
-    filter = {
-      'housing-type': 'any',
-      'housing-price': 'any',
-      'housing-rooms': 'any',
-      'housing-guests': 'any',
-      'filter-wifi': false,
-      'filter-dishwasher': false,
-      'filter-parking': false,
-      'filter-washer': false,
-      'filter-elevator': false,
-      'filter-conditioner': false
-    };
+    filter = {};
 
     filterForm.reset();
   };
 
   /**
-   * Проверяет соответствует цена фильтру
+   * Проверяет соответствует цены в объявлении фильтру
    * @param {number} price
    * @return {boolean}
    */
-  var checkPrice = function (price) {
-    var priceRange = priceValues[filter['housing-price']];
-    return price >= priceRange.MIN && price <= priceRange.MAX;
+  var isPriceMatchesFilter = function (price) {
+    if (filter[PRICE_PARAM]) {
+      var priceRange = PriceValue[filter[PRICE_PARAM]];
+      return price >= priceRange.MIN && price <= priceRange.MAX;
+    }
+    return true;
   };
 
   /**
-   * Возвращает true, если удобство выбрано в фильтре и его нет в объявлении
+   * Проверяет наличие выбранного в фильтре удобства у объявления
    * @param {string} feature
    * @param {Array.<string>} features
    * @return {boolean}
    */
-  var checkFeature = function (feature, features) {
-    var isNeeded = filter['filter-' + feature] === true;
-    var isNotInList = features.indexOf(feature) === -1;
-    return isNeeded && isNotInList;
+  var isFeatureMatchesFilter = function (feature, features) {
+    return filter[feature] ? features.indexOf(feature) !== -1 : true;
   };
 
   /**
-   * Возвращает true, если выбрано отличное от "любого" значение фильтра и
-   * это значение не совпадает со значением в объявлении
-   * @param {string} filterParam
+   * Проверяет наличие выбранного в фильтре значения у объявления
+   * @param {string} offerParam
    * @param {string} adParamValue
    * @return {boolean}
    */
-  var checkHousingParam = function (filterParam, adParamValue) {
-    var filterValue = filter['housing-' + filterParam];
-    var isNotAny = filterValue !== 'any';
-    var isNotMatchFilter = filterValue !== adParamValue;
-    return isNotAny && isNotMatchFilter;
+  var isOfferParamMatchesFilter = function (offerParam, adParamValue) {
+    return filter[offerParam] ? filter[offerParam] === adParamValue : true;
   };
 
   /**
@@ -114,17 +108,17 @@
   var isMatchFilter = function (ad) {
     for (var i = 0; i < HOUSING_PARAMS.length; i++) {
       var param = HOUSING_PARAMS[i];
-      if (checkHousingParam(param, ad.offer[param].toString(10))) {
+      if (!isOfferParamMatchesFilter(param, ad.offer[param].toString(10))) {
         return false;
       }
     }
 
-    if (filter['housing-price'] !== 'any' && !checkPrice(ad.offer.price)) {
+    if (!isPriceMatchesFilter(ad.offer.price)) {
       return false;
     }
 
     for (i = 0; i < FEATURES.length; i++) {
-      if (checkFeature(FEATURES[i], ad.offer.features)) {
+      if (!isFeatureMatchesFilter(FEATURES[i], ad.offer.features)) {
         return false;
       }
     }
@@ -133,26 +127,40 @@
   };
 
   /**
+   * Получает значения фильтра из переданного массива элементов
+   * @param {NodeListOf<HTMLElement>} inputElements
+   * @param {string} inputType
+   * @param {string} attribute
+   * @param {string} prefix
+   */
+  var getFilterItems = function (inputElements, inputType, attribute, prefix) {
+    Array.from(inputElements).forEach(function (item) {
+      if (item[attribute] !== ANY_VALUE[inputType]) {
+        filter[item.id.replace(prefix, '')] = item[attribute];
+      }
+    });
+  };
+
+  /**
+   * Заполняет массив с фильтром
+   */
+  var getFilter = function () {
+    filter = {};
+
+    getFilterItems(filterCheckboxes, 'checkbox', 'checked', Prefix.features);
+    getFilterItems(filterSelects, 'select', 'value', Prefix.offer);
+  };
+
+  /**
    * Обновляет содержимое карты в соответствии с фильтром
    */
   var applyPinsFilter = function () {
+    getFilter();
     window.card.closeActive();
 
     var ads = window.map.similarAds.slice();
     window.map.update(ads.filter(isMatchFilter));
   };
-
-  Array.from(filterCheckboxes).forEach(function (item) {
-    item.addEventListener('change', function (evt) {
-      filter[evt.target.id] = evt.target.checked;
-    });
-  });
-
-  Array.from(filterSelects).forEach(function (item) {
-    item.addEventListener('change', function (evt) {
-      filter[evt.target.id] = evt.target.value;
-    });
-  });
 
   filterForm.addEventListener('change', window.utils.debounce(applyPinsFilter));
 
