@@ -129,7 +129,7 @@
   };
 
   var resetClickHandler = function () {
-    window.resetFilter();
+    window.filter.reset();
     window.map.reset();
     window.card.closeActive();
 

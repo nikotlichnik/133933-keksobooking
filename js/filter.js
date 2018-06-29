@@ -13,6 +13,7 @@
 
 (function () {
   var filterForm = document.querySelector('.map__filters');
+  var filterFields = filterForm.querySelectorAll('input, select');
   var typeSelect = filterForm.querySelector('#housing-type');
   var priceSelect = filterForm.querySelector('#housing-price');
   var roomsSelect = filterForm.querySelector('#housing-rooms');
@@ -42,10 +43,23 @@
    */
   var ANY_VALUE = 'any';
 
+  var activateFilter = function () {
+    filterFields.forEach(function (item) {
+      item.disabled = false;
+    });
+  };
+
+  var deactivateFilter = function () {
+    filterFields.forEach(function (item) {
+      item.disabled = true;
+    });
+  };
+
   /**
    * Сбрасывает состояние фильтра в исходное состояние
    */
   var resetFilter = function () {
+    deactivateFilter();
     filterForm.reset();
   };
 
@@ -110,6 +124,11 @@
   };
 
   filterForm.addEventListener('change', window.utils.debounce(applyPinsFilter));
+  deactivateFilter();
 
-  window.resetFilter = resetFilter;
+  window.filter = {
+    reset: resetFilter,
+    activate: activateFilter,
+    deactivate: deactivateFilter
+  };
 })();

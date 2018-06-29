@@ -124,6 +124,7 @@
     pinsContainer.appendChild(createPinsFragment(ads));
 
     window.form.activate();
+    window.filter.activate();
     mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
   };
 
