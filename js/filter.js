@@ -13,11 +13,14 @@
 
 (function () {
   var filterForm = document.querySelector('.map__filters');
-  var filterSelects = filterForm.querySelectorAll('select');
-  var checkboxFieldset = filterForm.querySelector('.map__features');
+  var typeSelect = filterForm.querySelector('#housing-type');
+  var priceSelect = filterForm.querySelector('#housing-price');
+  var roomsSelect = filterForm.querySelector('#housing-rooms');
+  var guestsSelect = filterForm.querySelector('#housing-guests');
+  var featuresFieldset = filterForm.querySelector('.map__features');
 
   /**
-   * @enum {Range}
+   * @enum {Range | string}
    */
   var PriceValue = {
     low: {
@@ -35,21 +38,9 @@
   };
 
   /**
-   * @const {Object}
-   * @property {boolean} checkbox
-   * @property {string} select
+   * @type {string}
    */
-  var ANY_VALUE = {
-    select: 'any'
-  };
-
-  /**
-   * @enum {string}
-   */
-  var Prefix = {
-    offer: 'housing-'
-  };
-
+  var ANY_VALUE = 'any';
 
   /**
    * Сбрасывает состояние фильтра в исходное состояние
@@ -59,59 +50,48 @@
   };
 
   /**
-   * Проверяет соответствует цены в объявлении фильтру
-   * @param {number} price
-   * @param {string} filterValue
-   * @return {boolean}
-   */
-  var isPriceMatchesFilter = function (price, filterValue) {
-    var priceRange = PriceValue[filterValue];
-    return price >= priceRange.MIN && price <= priceRange.MAX;
-  };
-
-  /**
-   *
    * @param {Ad} ad
    * @return {boolean}
    */
-  var filterOfferParams = function (ad) {
-    var isMatch = true;
-
-    Array.from(filterSelects).forEach(function (select) {
-      if (select.value !== ANY_VALUE.select) {
-        var filterField = select.id.replace(Prefix.offer, '');
-
-        if (filterField === 'price') {
-
-          if (!isPriceMatchesFilter(ad.offer.price, select.value)) {
-            isMatch = false;
-          }
-
-        } else if (ad.offer[filterField].toString(10) !== select.value) {
-          isMatch = false;
-        }
-      }
-    });
-
-    return isMatch;
+  var filterType = function (ad) {
+    return typeSelect.value !== ANY_VALUE ? ad.offer.type === typeSelect.value : true;
   };
 
   /**
-   *
+   * @param {Ad} ad
+   * @return {boolean}
+   */
+  var filterPrice = function (ad) {
+    var priceRange = PriceValue[priceSelect.value];
+    return priceRange ? ad.offer.price >= priceRange.MIN && ad.offer.price <= priceRange.MAX : true;
+  };
+
+  /**
+   * @param {Ad} ad
+   * @return {boolean}
+   */
+  var filterGuests = function (ad) {
+    return guestsSelect.value !== ANY_VALUE ? ad.offer.guests.toString(10) === guestsSelect.value : true;
+  };
+
+  /**
+   * @param {Ad} ad
+   * @return {boolean}
+   */
+  var filterRooms = function (ad) {
+    return roomsSelect.value !== ANY_VALUE ? ad.offer.rooms.toString(10) === roomsSelect.value : true;
+  };
+
+  /**
    * @param {Ad} ad
    * @return {boolean}
    */
   var filterFeatures = function (ad) {
-    var checkedFeatures = checkboxFieldset.querySelectorAll(':checked');
-    var isMatch = true;
+    var checkedFeatures = featuresFieldset.querySelectorAll(':checked');
 
-    Array.from(checkedFeatures).forEach(function (checkbox) {
-      if (ad.offer.features.indexOf(checkbox.value) === -1) {
-        isMatch = false;
-      }
+    return Array.from(checkedFeatures).every(function (checkbox) {
+      return ad.offer.features.indexOf(checkbox.value) !== -1;
     });
-
-    return isMatch;
   };
 
   /**
@@ -120,7 +100,10 @@
   var applyPinsFilter = function () {
     var ads = window.map.similarAds.slice();
     ads = ads.filter(filterFeatures);
-    ads = ads.filter(filterOfferParams);
+    ads = ads.filter(filterPrice);
+    ads = ads.filter(filterType);
+    ads = ads.filter(filterGuests);
+    ads = ads.filter(filterRooms);
 
     window.card.closeActive();
     window.map.update(ads);
