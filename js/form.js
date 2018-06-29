@@ -17,7 +17,7 @@
   var capacityInput = adForm.querySelector('#capacity');
   var submitButton = adForm.querySelector('.ad-form__submit');
   var resetButton = adForm.querySelector('.ad-form__reset');
-  var adFieldsets = adForm.querySelectorAll('.ad-form__element');
+  var adFieldsets = adForm.querySelectorAll('.ad-form__element, .ad-form-header');
   var formSuccessElement = document.querySelector('.success');
   var formErrorElement = document.querySelector('.error');
 
