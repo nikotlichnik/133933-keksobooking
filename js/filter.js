@@ -12,13 +12,9 @@
  */
 
 (function () {
-  var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-  var HOUSING_PARAMS = ['type', 'rooms', 'guests'];
-  var PRICE_PARAM = 'price';
-
   var filterForm = document.querySelector('.map__filters');
   var filterSelects = filterForm.querySelectorAll('select');
-  var filterCheckboxes = filterForm.querySelectorAll('.map__checkbox');
+  var checkboxFieldset = filterForm.querySelector('.map__features');
 
   /**
    * @enum {Range}
@@ -44,7 +40,6 @@
    * @property {string} select
    */
   var ANY_VALUE = {
-    checkbox: false,
     select: 'any'
   };
 
@@ -52,114 +47,83 @@
    * @enum {string}
    */
   var Prefix = {
-    features: 'filter-',
     offer: 'housing-'
   };
 
-  var filter = {};
 
   /**
    * Сбрасывает состояние фильтра в исходное состояние
    */
   var resetFilter = function () {
-    filter = {};
-
     filterForm.reset();
   };
 
   /**
    * Проверяет соответствует цены в объявлении фильтру
    * @param {number} price
+   * @param {string} filterValue
    * @return {boolean}
    */
-  var isPriceMatchesFilter = function (price) {
-    if (filter[PRICE_PARAM]) {
-      var priceRange = PriceValue[filter[PRICE_PARAM]];
-      return price >= priceRange.MIN && price <= priceRange.MAX;
-    }
-    return true;
+  var isPriceMatchesFilter = function (price, filterValue) {
+    var priceRange = PriceValue[filterValue];
+    return price >= priceRange.MIN && price <= priceRange.MAX;
   };
 
   /**
-   * Проверяет наличие выбранного в фильтре удобства у объявления
-   * @param {string} feature
-   * @param {Array.<string>} features
-   * @return {boolean}
-   */
-  var isFeatureMatchesFilter = function (feature, features) {
-    return filter[feature] ? features.indexOf(feature) !== -1 : true;
-  };
-
-  /**
-   * Проверяет наличие выбранного в фильтре значения у объявления
-   * @param {string} offerParam
-   * @param {string} adParamValue
-   * @return {boolean}
-   */
-  var isOfferParamMatchesFilter = function (offerParam, adParamValue) {
-    return filter[offerParam] ? filter[offerParam] === adParamValue : true;
-  };
-
-  /**
-   * Проверяет соответствует ли объявление фильтру
+   *
    * @param {Ad} ad
    * @return {boolean}
    */
-  var isMatchFilter = function (ad) {
-    for (var i = 0; i < HOUSING_PARAMS.length; i++) {
-      var param = HOUSING_PARAMS[i];
-      if (!isOfferParamMatchesFilter(param, ad.offer[param].toString(10))) {
-        return false;
-      }
-    }
+  var filterOfferParams = function (ad) {
+    var isMatch = true;
 
-    if (!isPriceMatchesFilter(ad.offer.price)) {
-      return false;
-    }
+    Array.from(filterSelects).forEach(function (select) {
+      if (select.value !== ANY_VALUE.select) {
+        var filterField = select.id.replace(Prefix.offer, '');
 
-    for (i = 0; i < FEATURES.length; i++) {
-      if (!isFeatureMatchesFilter(FEATURES[i], ad.offer.features)) {
-        return false;
-      }
-    }
+        if (filterField === 'price') {
 
-    return true;
-  };
+          if (!isPriceMatchesFilter(ad.offer.price, select.value)) {
+            isMatch = false;
+          }
 
-  /**
-   * Получает значения фильтра из переданного массива элементов
-   * @param {NodeListOf<HTMLElement>} inputElements
-   * @param {string} inputType
-   * @param {string} attribute
-   * @param {string} prefix
-   */
-  var getFilterItems = function (inputElements, inputType, attribute, prefix) {
-    Array.from(inputElements).forEach(function (item) {
-      if (item[attribute] !== ANY_VALUE[inputType]) {
-        filter[item.id.replace(prefix, '')] = item[attribute];
+        } else if (ad.offer[filterField].toString(10) !== select.value) {
+          isMatch = false;
+        }
       }
     });
+
+    return isMatch;
   };
 
   /**
-   * Заполняет массив с фильтром
+   *
+   * @param {Ad} ad
+   * @return {boolean}
    */
-  var getFilter = function () {
-    filter = {};
+  var filterFeatures = function (ad) {
+    var checkedFeatures = checkboxFieldset.querySelectorAll(':checked');
+    var isMatch = true;
 
-    getFilterItems(filterCheckboxes, 'checkbox', 'checked', Prefix.features);
-    getFilterItems(filterSelects, 'select', 'value', Prefix.offer);
+    Array.from(checkedFeatures).forEach(function (checkbox) {
+      if (ad.offer.features.indexOf(checkbox.value) === -1) {
+        isMatch = false;
+      }
+    });
+
+    return isMatch;
   };
 
   /**
    * Обновляет содержимое карты в соответствии с фильтром
    */
   var applyPinsFilter = function () {
-    getFilter();
-    window.card.closeActive();
-
     var ads = window.map.similarAds.slice();
-    window.map.update(ads.filter(isMatchFilter));
+    ads = ads.filter(filterFeatures);
+    ads = ads.filter(filterOfferParams);
+
+    window.card.closeActive();
+    window.map.update(ads);
   };
 
   filterForm.addEventListener('change', window.utils.debounce(applyPinsFilter));
