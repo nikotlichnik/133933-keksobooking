@@ -43,7 +43,11 @@
    */
   var ANY_VALUE = 'any';
 
-  var activateFilters = function () {
+  /**
+   * @param {Array.<Ad>} ads
+   */
+  var activateFilters = function (ads) {
+    window.filter.ads = ads;
     filterFields.forEach(function (item) {
       item.disabled = false;
     });
@@ -87,7 +91,7 @@
   /**
    * Возвращает функцию-фильтр для сравнения значения из поля select и поля в объекте
    * @param {HTMLSelectElement} selectElement
-   * @param {string} property
+   * @param {string} property - Поле в объекте ad
    * @return {Function}
    */
   var createFilter = function (selectElement, property) {
@@ -100,7 +104,7 @@
    * Обновляет содержимое карты в соответствии с фильтром
    */
   var applyPinsFilter = function () {
-    var ads = window.map.similarAds.slice();
+    var ads = window.filter.ads.slice();
     ads = ads.filter(filterFeatures);
     ads = ads.filter(filterPrice);
     ads = ads.filter(createFilter(typeSelect, 'type'));

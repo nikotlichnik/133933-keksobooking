@@ -118,13 +118,11 @@
    * @param {Array.<Ad>} ads - Массив объявлений
    */
   var successDownloadHandler = function (ads) {
-    window.map.similarAds = ads.slice();
-
     map.classList.remove('map--faded');
     pinsContainer.appendChild(createPinsFragment(ads));
 
     window.form.activate();
-    window.filter.activate();
+    window.filter.activate(ads.slice());
     mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
   };
 
