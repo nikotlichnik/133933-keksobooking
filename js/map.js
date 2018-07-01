@@ -49,6 +49,11 @@
   var mapErrorElement = document.querySelector('.error');
 
   /**
+   * @const {number}
+   */
+  var MAX_NUM_OF_PINS = 5;
+
+  /**
    * Параметры главного маркера выбора адреса на карте
    * @type {Object}
    * @property {number} WIDTH
@@ -84,12 +89,18 @@
    */
   var pinsOnMap = [];
 
-  var resetMapToInitialState = function () {
-    // Удаляем все указатели с карты, кроме главного
+  /**
+   * Удаляет все указатели с карты, кроме главного
+   */
+  var clearMap = function () {
     pinsOnMap.forEach(function (item) {
       item.parentNode.removeChild(item);
     });
     pinsOnMap = [];
+  };
+
+  var resetMapToInitialState = function () {
+    clearMap();
 
     // Ставим приветственное сообщение
     map.classList.add('map--faded');
@@ -98,6 +109,9 @@
     mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
     mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
     mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
+
+    // Очищаем список объявлений
+    window.map.similarAds = [];
   };
 
   /**
@@ -108,7 +122,17 @@
     pinsContainer.appendChild(createPinsFragment(ads));
 
     window.form.activate();
+    window.filter.activate(ads.slice());
     mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
+  };
+
+  /**
+   * Обновляет содержимое карты на переданный массив объявлений
+   * @param {Array.<Ad>} ads
+   */
+  var updateMap = function (ads) {
+    clearMap();
+    pinsContainer.appendChild(createPinsFragment(ads));
   };
 
   /**
@@ -146,13 +170,18 @@
    */
   var createPinsFragment = function (ads) {
     var fragment = document.createDocumentFragment();
+    var numOfPins = 0;
 
-    ads.forEach(function (item) {
-      var pin = window.pin.create(item);
+    if (ads.length) {
+      numOfPins = ads.length < MAX_NUM_OF_PINS ? ads.length : MAX_NUM_OF_PINS;
+    }
+
+    for (var i = 0; i < numOfPins; i++) {
+      var pin = window.pin.create(ads[i]);
 
       pinsOnMap.push(pin);
       fragment.appendChild(pin);
-    });
+    }
 
     return fragment;
   };
@@ -216,6 +245,7 @@
   window.map = {
     insertCard: insertCard,
     getAddress: getMainPinAddress,
-    reset: resetMapToInitialState
+    reset: resetMapToInitialState,
+    update: updateMap
   };
 })();
