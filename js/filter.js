@@ -21,7 +21,7 @@
   var featuresFieldset = filterForm.querySelector('.map__features');
 
   /**
-   * @enum {Range | string}
+   * @enum {Range}
    */
   var PriceValue = {
     low: {
@@ -43,13 +43,13 @@
    */
   var ANY_VALUE = 'any';
 
-  var activateFilter = function () {
+  var activateFilters = function () {
     filterFields.forEach(function (item) {
       item.disabled = false;
     });
   };
 
-  var deactivateFilter = function () {
+  var deactivateFilters = function () {
     filterFields.forEach(function (item) {
       item.disabled = true;
     });
@@ -59,16 +59,8 @@
    * Сбрасывает состояние фильтра в исходное состояние
    */
   var resetFilter = function () {
-    deactivateFilter();
+    deactivateFilters();
     filterForm.reset();
-  };
-
-  /**
-   * @param {Ad} ad
-   * @return {boolean}
-   */
-  var filterType = function (ad) {
-    return typeSelect.value !== ANY_VALUE ? ad.offer.type === typeSelect.value : true;
   };
 
   /**
@@ -84,22 +76,6 @@
    * @param {Ad} ad
    * @return {boolean}
    */
-  var filterGuests = function (ad) {
-    return guestsSelect.value !== ANY_VALUE ? ad.offer.guests.toString(10) === guestsSelect.value : true;
-  };
-
-  /**
-   * @param {Ad} ad
-   * @return {boolean}
-   */
-  var filterRooms = function (ad) {
-    return roomsSelect.value !== ANY_VALUE ? ad.offer.rooms.toString(10) === roomsSelect.value : true;
-  };
-
-  /**
-   * @param {Ad} ad
-   * @return {boolean}
-   */
   var filterFeatures = function (ad) {
     var checkedFeatures = featuresFieldset.querySelectorAll(':checked');
 
@@ -109,26 +85,38 @@
   };
 
   /**
+   * Возвращает функцию-фильтр для сравнения значения из поля select и поля в объекте
+   * @param {HTMLSelectElement} selectElement
+   * @param {string} property
+   * @return {Function}
+   */
+  var createFilter = function (selectElement, property) {
+    return function (ad) {
+      return selectElement.value !== ANY_VALUE ? ad.offer[property].toString(10) === selectElement.value : true;
+    };
+  };
+
+  /**
    * Обновляет содержимое карты в соответствии с фильтром
    */
   var applyPinsFilter = function () {
     var ads = window.map.similarAds.slice();
     ads = ads.filter(filterFeatures);
     ads = ads.filter(filterPrice);
-    ads = ads.filter(filterType);
-    ads = ads.filter(filterGuests);
-    ads = ads.filter(filterRooms);
+    ads = ads.filter(createFilter(typeSelect, 'type'));
+    ads = ads.filter(createFilter(guestsSelect, 'guests'));
+    ads = ads.filter(createFilter(roomsSelect, 'rooms'));
 
     window.card.closeActive();
     window.map.update(ads);
   };
 
   filterForm.addEventListener('change', window.utils.debounce(applyPinsFilter));
-  deactivateFilter();
+  deactivateFilters();
 
   window.filter = {
     reset: resetFilter,
-    activate: activateFilter,
-    deactivate: deactivateFilter
+    activate: activateFilters,
+    deactivate: deactivateFilters
   };
 })();
