@@ -26,7 +26,7 @@
   };
 
   avatarChooser.addEventListener('change', function () {
-    var file = avatarChooser.files.length !== 0 ? avatarChooser.files[0] : '';
+    var file = avatarChooser.files.length ? avatarChooser.files[0] : '';
 
     if (file && isPossibleExtension(file)) {
       var reader = new FileReader();
