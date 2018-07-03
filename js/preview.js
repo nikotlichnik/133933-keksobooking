@@ -15,6 +15,16 @@
   var houseImagesContainer = document.querySelector('.ad-form__photo-container');
 
   /**
+   * Удаляет существующие превью изображений жилья
+   */
+  var deleteHouseImagesPreview = function () {
+    var existingPreviews = document.querySelectorAll('.ad-form__photo');
+    Array.from(existingPreviews).forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  };
+
+  /**
    * Проверяет соответствует ли файл из input'а одному из возможных расширений
    * @param {Object} file
    * @return {boolean}
@@ -43,11 +53,7 @@
   });
 
   houseImageChooser.addEventListener('change', function () {
-    // Удаляем существующие превью
-    var existingPreviews = document.querySelectorAll('.ad-form__photo');
-    Array.from(existingPreviews).forEach(function (item) {
-      item.parentNode.removeChild(item);
-    });
+    deleteHouseImagesPreview();
 
     // Проверяем, чтобы все файлы были с нужными расширениями
     var isCorrectFileExtensions = Array.from(houseImageChooser.files).every(isPossibleExtension);
@@ -71,4 +77,9 @@
       houseImageChooser.value = '';
     }
   });
+
+  window.deletePreviews = function () {
+    avatarPreview.src = DEFAULT_IMAGE_PATH;
+    deleteHouseImagesPreview();
+  };
 })();

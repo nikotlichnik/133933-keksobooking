@@ -106,6 +106,20 @@
   };
 
   /**
+   * Приводит страницу в исходное неактивное состояние
+   */
+  var deactivatePage = function () {
+    window.filter.reset();
+    window.map.reset();
+    window.card.closeActive();
+
+    window.deletePreviews();
+    resetFieldsValues();
+    disableForm();
+    removeFormHandlers();
+  };
+
+  /**
    * @param {string} messageText
    */
   var errorFormSendHandler = function (messageText) {
@@ -116,6 +130,7 @@
   var successFormSendHandler = function () {
     resetFieldsValues();
     window.message.show(formSuccessElement);
+    deactivatePage();
   };
 
   var submitClickHandler = function (evt) {
@@ -129,13 +144,7 @@
   };
 
   var resetClickHandler = function () {
-    window.filter.reset();
-    window.map.reset();
-    window.card.closeActive();
-
-    resetFieldsValues();
-    disableForm();
-    removeFormHandlers();
+    deactivatePage();
   };
 
   /**
