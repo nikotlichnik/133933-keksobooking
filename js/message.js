@@ -28,6 +28,7 @@
   };
 
   /**
+   * Показывает информационное сообщение
    * @param {HTMLElement} messageElement
    * @param {string} messageText
    */
