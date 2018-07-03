@@ -10,52 +10,52 @@
 
   /**
    * @param {XMLHttpRequest} xhr
-   * @param {function} onLoad
-   * @param {function} onError
+   * @param {function} loadHandler
+   * @param {function} errorHandler
    */
-  var addLoadListener = function (xhr, onLoad, onError) {
+  var addLoadListener = function (xhr, loadHandler, errorHandler) {
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
-        onLoad(xhr.response);
+        loadHandler(xhr.response);
       } else {
-        onError('Ошибка ' + xhr.status);
+        errorHandler('Ошибка ' + xhr.status);
       }
     });
   };
 
   /**
    * @param {XMLHttpRequest} xhr
-   * @param {function} onError
+   * @param {function} errorHandler
    */
-  var addErrorListener = function (xhr, onError) {
+  var addErrorListener = function (xhr, errorHandler) {
     xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
+      errorHandler('Произошла ошибка соединения');
     });
   };
 
   /**
    * @param {XMLHttpRequest} xhr
-   * @param {function} onError
+   * @param {function} errorHandler
    */
-  var addTimeoutListener = function (xhr, onError) {
+  var addTimeoutListener = function (xhr, errorHandler) {
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout + ' мс');
+      errorHandler('Запрос не успел выполниться за ' + xhr.timeout + ' мс');
     });
   };
 
   /**
    * Загружает с сервера данные в формате JSON
-   * @param {function} onLoad
-   * @param {function} onError
+   * @param {function} loadHandler
+   * @param {function} errorHandler
    */
-  var download = function (onLoad, onError) {
+  var download = function (loadHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
 
     xhr.responseType = 'json';
 
-    addLoadListener(xhr, onLoad, onError);
-    addErrorListener(xhr, onError);
-    addTimeoutListener(xhr, onError);
+    addLoadListener(xhr, loadHandler, errorHandler);
+    addErrorListener(xhr, errorHandler);
+    addTimeoutListener(xhr, errorHandler);
 
     xhr.open('GET', DOWNLOAD_URL);
     xhr.send();
@@ -64,15 +64,15 @@
   /**
    * Отправляет на сервер данные формы
    * @param {FormData} data
-   * @param {function} onLoad
-   * @param {function} onError
+   * @param {function} loadHandler
+   * @param {function} errorHandler
    */
-  var upload = function (data, onLoad, onError) {
+  var upload = function (data, loadHandler, errorHandler) {
     var xhr = new XMLHttpRequest();
 
-    addLoadListener(xhr, onLoad, onError);
-    addErrorListener(xhr, onError);
-    addTimeoutListener(xhr, onError);
+    addLoadListener(xhr, loadHandler, errorHandler);
+    addErrorListener(xhr, errorHandler);
+    addTimeoutListener(xhr, errorHandler);
 
     xhr.open('POST', UPLOAD_URL);
     xhr.send(data);
