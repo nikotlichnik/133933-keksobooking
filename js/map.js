@@ -42,10 +42,10 @@
  */
 
 (function () {
-  var map = document.querySelector('.map');
-  var filtersContainer = map.querySelector('.map__filters-container');
-  var mainPin = map.querySelector('.map__pin--main');
-  var pinsContainer = map.querySelector('.map__pins');
+  var mapElement = document.querySelector('.map');
+  var filtersContainer = mapElement.querySelector('.map__filters-container');
+  var mainPinElement = mapElement.querySelector('.map__pin--main');
+  var pinsContainer = mapElement.querySelector('.map__pins');
   var mapErrorElement = document.querySelector('.error');
 
   /**
@@ -103,12 +103,12 @@
     clearMap();
 
     // Ставим приветственное сообщение
-    map.classList.add('map--faded');
+    mapElement.classList.add('map--faded');
 
     // Восстанавливаем состояние главного маркера
-    mainPin.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
-    mainPin.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
-    mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
+    mainPinElement.style.left = mainPinParams.DEFAULT_OFFSET_LEFT + 'px';
+    mainPinElement.style.top = mainPinParams.DEFAULT_OFFSET_TOP + 'px';
+    mainPinElement.addEventListener('mousedown', mainPinInitialClickHandler);
 
     // Очищаем список объявлений
     window.map.similarAds = [];
@@ -118,12 +118,12 @@
    * @param {Array.<Ad>} ads - Массив объявлений
    */
   var successDownloadHandler = function (ads) {
-    map.classList.remove('map--faded');
+    mapElement.classList.remove('map--faded');
     pinsContainer.appendChild(createPinsFragment(ads));
 
     window.form.activate();
     window.filter.activate(ads.slice());
-    mainPin.removeEventListener('mousedown', mainPinInitialClickHandler);
+    mainPinElement.removeEventListener('mousedown', mainPinInitialClickHandler);
   };
 
   /**
@@ -159,8 +159,8 @@
     dy = dy ? dy : 0;
 
     return {
-      x: mainPin.offsetLeft + dx + Math.floor(mainPinParams.WIDTH / 2),
-      y: mainPin.offsetTop + dy + mainPinParams.HEIGHT
+      x: mainPinElement.offsetLeft + dx + Math.floor(mainPinParams.WIDTH / 2),
+      y: mainPinElement.offsetTop + dy + mainPinParams.HEIGHT
     };
   };
 
@@ -191,12 +191,12 @@
    * @param {Node} card
    */
   var insertCard = function (card) {
-    map.insertBefore(card, filtersContainer);
+    mapElement.insertBefore(card, filtersContainer);
   };
 
   // Добавляем обработчики событий на главный маркер
-  mainPin.addEventListener('mousedown', mainPinInitialClickHandler);
-  mainPin.addEventListener('mousedown', function (evt) {
+  mainPinElement.addEventListener('mousedown', mainPinInitialClickHandler);
+  mainPinElement.addEventListener('mousedown', function (evt) {
 
     var cursorCoords = {
       x: evt.clientX,
@@ -219,10 +219,10 @@
 
       // Перемещаем, если новый адрес попадает в заданные рамки
       if (newCoords.y <= mapBorders.BOTTOM && newCoords.y >= mapBorders.TOP) {
-        mainPin.style.top = (mainPin.offsetTop + shift.y) + 'px';
+        mainPinElement.style.top = (mainPinElement.offsetTop + shift.y) + 'px';
       }
       if (newCoords.x <= mapBorders.RIGHT && newCoords.x >= mapBorders.LEFT) {
-        mainPin.style.left = (mainPin.offsetLeft + shift.x) + 'px';
+        mainPinElement.style.left = (mainPinElement.offsetLeft + shift.x) + 'px';
       }
 
       // Обновляем поле с адресом
