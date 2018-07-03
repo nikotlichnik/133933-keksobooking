@@ -5,12 +5,12 @@
  */
 
 (function () {
-  var activeMessage;
+  var activeMessageElement;
 
   var removeMessageHandlers = function () {
-    activeMessage.removeEventListener('click', messageClickHandler);
+    activeMessageElement.removeEventListener('click', messageClickHandler);
     document.removeEventListener('keydown', messageEscPressHandler);
-    activeMessage = null;
+    activeMessageElement = null;
   };
 
   var messageClickHandler = function () {
@@ -24,24 +24,25 @@
   };
 
   var hideMessage = function () {
-    activeMessage.classList.add('hidden');
+    activeMessageElement.classList.add('hidden');
   };
 
   /**
+   * Показывает информационное сообщение
    * @param {HTMLElement} messageElement
    * @param {string} messageText
    */
   var showMessage = function (messageElement, messageText) {
-    activeMessage = messageElement;
+    activeMessageElement = messageElement;
 
     if (messageText) {
-      var textContainer = activeMessage.querySelector('p');
+      var textContainer = activeMessageElement.querySelector('p');
       textContainer.textContent = messageText;
     }
 
-    activeMessage.classList.remove('hidden');
+    activeMessageElement.classList.remove('hidden');
 
-    activeMessage.addEventListener('click', messageClickHandler);
+    activeMessageElement.addEventListener('click', messageClickHandler);
     document.addEventListener('keydown', messageEscPressHandler);
   };
 

@@ -22,23 +22,23 @@
    * Содержит ссылку на пин, карточка которого открыта
    * @type {Node}
    */
-  var activePin;
+  var activePinElement;
 
   /**
    * Добавляет класс пину, карточка которого открыта, и сохраняет ссылку на него
    * @param {Node} pin
    */
   var setActivePin = function (pin) {
-    activePin = pin;
-    activePin.classList.add('map__pin--active');
+    activePinElement = pin;
+    activePinElement.classList.add('map__pin--active');
   };
 
   /**
    * Убирает класс у активного пина и сбрасывает ссылку на него
    */
   var deactivatePin = function () {
-    activePin.classList.remove('map__pin--active');
-    activePin = null;
+    activePinElement.classList.remove('map__pin--active');
+    activePinElement = null;
   };
 
   /**

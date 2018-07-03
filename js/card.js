@@ -11,7 +11,7 @@
    * Содержит ссылку на открытую карточку с информацией
    * @type {Node}
    */
-  var activeCard;
+  var activeCardElement;
 
   /**
    * Параметры фотографии жилья
@@ -133,12 +133,12 @@
    * @param {Ad} ad - Объявление
    */
   var openCard = function (ad) {
-    if (activeCard) {
+    if (activeCardElement) {
       closeActiveCard();
     }
-    activeCard = createCard(ad);
+    activeCardElement = createCard(ad);
 
-    window.map.insertCard(activeCard);
+    window.map.insertCard(activeCardElement);
     document.addEventListener('keydown', escapeKeyPressHandler);
   };
 
@@ -146,9 +146,9 @@
    * Закрывает открытую карточку и сбрасывает ссылку на неё
    */
   var closeActiveCard = function () {
-    if (activeCard) {
-      activeCard.parentNode.removeChild(activeCard);
-      activeCard = null;
+    if (activeCardElement) {
+      activeCardElement.parentNode.removeChild(activeCardElement);
+      activeCardElement = null;
 
       window.pin.deactivate();
 
